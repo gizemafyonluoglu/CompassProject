@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+
+<StackPane prefHeight="600.0" prefWidth="900.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.compass.demo1.ProfileController">
+    <children>
+
+        <BorderPane>
+            <left>
+                <VBox alignment="TOP_CENTER" prefWidth="80.0" spacing="20.0" style="-fx-background-color: #F8F9FA; -fx-border-color: #E5E7EB; -fx-border-width: 0 1 0 0;">
+                    <padding><Insets top="30.0" /></padding>
+                    <children>
+                        <Button styleClass="sidebar-button-active">
+                            <graphic><ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true"><image><Image url="@icons/profile.png" /></image></ImageView></graphic>
+                        </Button>
+                        <Button onAction="#goToFriends" styleClass="sidebar-button">
+                            <graphic><ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true"><image><Image url="@icons/friend.png" /></image></ImageView></graphic>
+                        </Button>
+                        <Button onAction="#goToHome" styleClass="sidebar-button">
+                            <graphic><ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true"><image><Image url="@icons/home.png" /></image></ImageView></graphic>
+                        </Button>
+                        <Button onAction="#goToActivity" styleClass="sidebar-button">
+                            <graphic><ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true"><image><Image url="@icons/activity.png" /></image></ImageView></graphic>
+                        </Button>
+                        <Button onAction="#goToCalendar" styleClass="sidebar-button">
+                            <graphic><ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true"><image><Image url="@icons/calendar.png" /></image></ImageView></graphic>
+                        </Button>
+                    </children>
+                </VBox>
+            </left>
+
+            <center>
+                <VBox spacing="30.0" style="-fx-background-color: white;">
+                    <padding><Insets bottom="40.0" left="50.0" right="50.0" top="40.0" /></padding>
+                    <children>
+
+                        <HBox alignment="CENTER_LEFT">
+                            <Label style="-fx-font-size: 40; -fx-font-weight: bold; -fx-text-fill: #8A2BE2; -fx-underline: true;" text="Profile" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <HBox spacing="15.0">
+                                <Button onAction="#showBoardMembershipPopup" styleClass="button-primary" text="Board Membership" />
+                                <Button onAction="#showSignOutPopup" styleClass="button-danger" text="Sign Out" />
+                            </HBox>
+                        </HBox>
+
+                        <HBox spacing="50.0">
+                            <VBox alignment="TOP_CENTER" spacing="15.0">
+                                <StackPane prefHeight="180.0" prefWidth="180.0">
+                                    <Circle fill="#8A2BE2" radius="90.0" />
+                                    <ImageView fx:id="profileImageView" fitHeight="180.0" fitWidth="180.0" />
+                                    <Label fx:id="defaultUserIcon" style="-fx-font-size: 80; -fx-text-fill: white;" text="👤" />
+                                </StackPane>
+                                <Button onAction="#handleChangePhoto" style="-fx-background-radius: 20;" styleClass="button-primary" text="Change Profile Photo" />
+                            </VBox>
+
+                            <VBox spacing="20.0" HBox.hgrow="ALWAYS">
+                                <HBox alignment="CENTER_LEFT" styleClass="profile-field-box">
+                                    <TextField fx:id="nameTextField" styleClass="profile-text-field" text="Ali Kaya" HBox.hgrow="ALWAYS" />
+                                </HBox>
+
+                                <HBox alignment="CENTER_LEFT" styleClass="profile-field-box">
+                                    <Label style="-fx-font-weight: bold; -fx-text-fill: #4B5563;" text="yzu@ug.bilkent.edu.tr" />
+                                </HBox>
+
+                                <HBox alignment="CENTER_LEFT" onMouseClicked="#showInterestsPopup" style="-fx-cursor: hand;" styleClass="profile-field-box">
+                                    <HBox fx:id="interestsBox" spacing="8.0" /> <Region HBox.hgrow="ALWAYS" />
+                                    <Label style="-fx-text-fill: #8A2BE2; -fx-font-size: 14;" text="▼ Edit your interests" />
+                                </HBox>
+                            </VBox>
+                        </HBox>
+                    </children>
+                </VBox>
+            </center>
+        </BorderPane>
+
+        <Pane fx:id="overlay" onMouseClicked="#hideAllPopups" style="-fx-background-color: rgba(0,0,0,0.5);" visible="false" />
+
+        <VBox fx:id="signOutPopup" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="400.0" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 15, 0, 0, 0);" visible="false">
+            <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
+            <children>
+                <HBox alignment="CENTER_LEFT">
+                    <Label style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #DC2626;" text="Sign Out" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button onAction="#hideAllPopups" style="-fx-text-fill: #9CA3AF;" styleClass="icon-button" text="X" />
+                </HBox>
+                <Label style="-fx-text-fill: #6B7280;" text="Are you sure you want to sign out?" />
+                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                    <Button onAction="#hideAllPopups" styleClass="button-secondary" text="Cancel" />
+                    <Button onAction="#confirmSignOut" styleClass="button-danger" text="Sign Out" />
+                </HBox>
+            </children>
+        </VBox>
+
+        <VBox fx:id="boardMembershipPopup" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="450.0" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 15, 0, 0, 0);" visible="false">
+            <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
+            <children>
+                <HBox alignment="CENTER_LEFT">
+                    <Label style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #8A2BE2;" text="Upload a file to verify your membership" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button onAction="#hideAllPopups" style="-fx-text-fill: #9CA3AF;" styleClass="icon-button" text="X" />
+                </HBox>
+                <HBox alignment="CENTER_LEFT" onMouseClicked="#handleFileUpload" style="-fx-cursor: hand;" styleClass="profile-field-box">
+                    <Label fx:id="fileNameLabel" style="-fx-text-fill: #9CA3AF;" text="Upload a file..." />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label style="-fx-text-fill: #8A2BE2; -fx-font-size: 18;" text="⬆" />
+                </HBox>
+                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                    <Button onAction="#hideAllPopups" styleClass="button-secondary" text="Cancel" />
+                    <Button onAction="#submitBoardMembership" styleClass="button-primary" text="Upload" />
+                </HBox>
+            </children>
+        </VBox>
+
+        <VBox fx:id="interestsPopup" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="450.0" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 15, 0, 0, 0);" visible="false">
+            <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
+            <children>
+                <HBox alignment="CENTER_LEFT">
+                    <Label style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #8A2BE2;" text="Select Your Interests" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button onAction="#hideAllPopups" style="-fx-text-fill: #9CA3AF;" styleClass="icon-button" text="X" />
+                </HBox>
+
+                <FlowPane fx:id="interestsToggleGroup" hgap="10.0" vgap="10.0">
+                    <ToggleButton styleClass="interest-toggle" text="Music" />
+                    <ToggleButton styleClass="interest-toggle" text="Arts" />
+                    <ToggleButton styleClass="interest-toggle" text="Sports" />
+                    <ToggleButton styleClass="interest-toggle" text="Technology" />
+                    <ToggleButton styleClass="interest-toggle" text="Cinema" />
+                    <ToggleButton styleClass="interest-toggle" text="Coding" />
+                </FlowPane>
+
+                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                    <Button onAction="#hideAllPopups" styleClass="button-secondary" text="Cancel" />
+                    <Button onAction="#saveInterests" styleClass="button-primary" text="Save" />
+                </HBox>
+            </children>
+        </VBox>
+
+    </children>
+</StackPane>

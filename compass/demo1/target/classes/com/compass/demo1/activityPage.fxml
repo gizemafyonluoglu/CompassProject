@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane prefHeight="600.0" prefWidth="900.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.compass.demo1.ActivityPageController">
+    <children>
+        <BorderPane>
+            <left>
+                <VBox alignment="TOP_CENTER" prefWidth="80.0" spacing="20.0" style="-fx-background-color: #F8F9FA; -fx-border-color: #E5E7EB; -fx-border-width: 0 1 0 0;">
+                    <padding><Insets top="30.0" /></padding>
+                    <children>
+                        <Button onAction="#goToProfile" styleClass="sidebar-button">
+                            <graphic><ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true"><image><Image url="@icons/profile.png" /></image></ImageView></graphic>
+                        </Button>
+                        <Button onAction="#goToFriends" styleClass="sidebar-button">
+                            <graphic><ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true"><image><Image url="@icons/friend.png" /></image></ImageView></graphic>
+                        </Button>
+                        <Button onAction="#goToHome" styleClass="sidebar-button">
+                            <graphic><ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true"><image><Image url="@icons/home.png" /></image></ImageView></graphic>
+                        </Button>
+                        <Button styleClass="sidebar-button-active">
+                            <graphic><ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true"><image><Image url="@icons/activity.png" /></image></ImageView></graphic>
+                        </Button>
+                        <Button onAction="#goToCalendar" styleClass="sidebar-button">
+                            <graphic><ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true"><image><Image url="@icons/calendar.png" /></image></ImageView></graphic>
+                        </Button>
+                    </children>
+                </VBox>
+            </left>
+
+            <center>
+                <VBox spacing="20.0" style="-fx-background-color: #F3F4F6;">
+                    <padding><Insets bottom="30.0" left="40.0" right="40.0" top="30.0" /></padding>
+                    <children>
+                        <Label style="-fx-font-size: 36; -fx-font-weight: bold; -fx-text-fill: #8A2BE2; -fx-underline: true;" text="Search Activities" />
+
+                        <HBox alignment="CENTER_LEFT" spacing="15.0">
+                            <TextField fx:id="searchField" prefWidth="400.0" promptText="Search activity or place..." styleClass="search-bar" />
+
+                            <Button onAction="#showFilterPopup" style="-fx-background-color: transparent; -fx-cursor: hand;">
+                                <graphic>
+                                    <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                                        <image><Image url="@icons/filter.png" /></image>
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Button onAction="#goToCreateActivity" styleClass="button-primary" text="+ Create Activities" />
+                        </HBox>
+
+                        <HBox alignment="CENTER_LEFT" spacing="15.0">
+                            <padding><Insets left="20.0" right="20.0" /></padding>
+                            <Label prefWidth="180.0" styleClass="column-header" text="Activity" />
+                            <Label prefWidth="200.0" styleClass="column-header" text="Place" />
+                            <Label prefWidth="100.0" styleClass="column-header" text="Date" />
+                            <Label prefWidth="120.0" styleClass="column-header" text="Time" />
+                            <Label prefWidth="60.0" styleClass="column-header" text="Quota" />
+                        </HBox>
+
+                        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: #F3F4F6;" VBox.vgrow="ALWAYS">
+                            <content>
+                                <VBox fx:id="activitiesListContainer" spacing="15.0">
+                                    <padding><Insets bottom="10.0" right="10.0" /></padding>
+                                </VBox>
+                            </content>
+                        </ScrollPane>
+                    </children>
+                </VBox>
+            </center>
+        </BorderPane>
+
+        <Pane fx:id="overlay" onMouseClicked="#hideAllPopups" style="-fx-background-color: rgba(0,0,0,0.5);" visible="false" />
+
+        <VBox fx:id="filterPopup" maxHeight="-Infinity" maxWidth="500.0" spacing="20.0" styleClass="card" visible="false">
+            <padding><Insets bottom="25.0" left="30.0" right="30.0" top="25.0" /></padding>
+            <children>
+                <HBox alignment="CENTER_LEFT">
+                    <VBox>
+                        <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="Filter Activities" />
+                        <Label style="-fx-text-fill: #6B7280;" text="Filter activities by interests, date, and time" />
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button onAction="#hideAllPopups" styleClass="icon-button" text="X" />
+                </HBox>
+
+                <HBox spacing="20.0">
+                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                        <Label style="-fx-font-weight: bold;" text="Date" />
+                        <DatePicker maxWidth="Infinity" promptText="Select Date" styleClass="profile-field-box" />
+                    </VBox>
+                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                        <Label style="-fx-font-weight: bold;" text="Time" />
+                        <TextField promptText="18 : 00" styleClass="profile-field-box" />
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="10.0">
+                    <Label style="-fx-font-weight: bold;" text="Interests" />
+                    <FlowPane hgap="10.0" vgap="10.0">
+                        <ToggleButton styleClass="interest-toggle" text="Music" />
+                        <ToggleButton styleClass="interest-toggle" text="Movies" />
+                        <ToggleButton styleClass="interest-toggle" text="Travel" />
+                        <ToggleButton styleClass="interest-toggle" text="Photography" />
+                        <ToggleButton styleClass="interest-toggle" text="Painting" />
+                    </FlowPane>
+                </VBox>
+
+                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                    <Button onAction="#hideAllPopups" styleClass="button-secondary" text="Cancel" />
+                    <Button onAction="#applyFilters" styleClass="button-primary" text="Apply Filters" />
+                </HBox>
+            </children>
+        </VBox>
+
+        <VBox fx:id="conflictPopup" maxHeight="-Infinity" maxWidth="450.0" spacing="15.0" styleClass="card" visible="false">
+            <padding><Insets bottom="25.0" left="30.0" right="30.0" top="25.0" /></padding>
+            <children>
+                <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="Time Conflict" />
+                <Label style="-fx-text-fill: #6B7280; -fx-wrap-text: true;" text="You have another activity scheduled at this time. Do you want to continue?" />
+                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                    <Button onAction="#hideAllPopups" styleClass="button-secondary" text="Cancel" />
+                    <Button onAction="#joinConflictActivity" styleClass="button-primary" text="Join Anyway" />
+                </HBox>
+            </children>
+        </VBox>
+
+    </children>
+</StackPane>

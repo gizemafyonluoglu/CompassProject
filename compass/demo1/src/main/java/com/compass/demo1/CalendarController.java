@@ -1,0 +1,259 @@
+package com.compass.demo1;
+
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+public class CalendarController {
+
+    @FXML private VBox mainContentArea;
+    @FXML private Button modeBtn;
+    @FXML private Label pageTitle, lblCourse, lblPerm, lblOneTime;
+    @FXML private HBox daysHeader;
+    @FXML private VBox calendarGrid;
+    @FXML private Pane eventsOverlay;
+
+    // Pop-up Bileşenleri
+    @FXML private Pane overlay;
+    @FXML private VBox addPlanPopup;
+    @FXML private ComboBox<String> cmbDay;
+    @FXML private TextField inpName, inpStart, inpEnd;
+    @FXML private RadioButton rbCourse, rbPerm, rbOneTime;
+
+    private boolean isDayMode = true;
+    private final int HOUR_HEIGHT = 60; // 1 saatin piksel cinsinden yüksekliği
+
+    @FXML
+    public void initialize() {
+        // Radyo butonlarını bir gruba alalım ki aynı anda sadece biri seçilsin
+        ToggleGroup group = new ToggleGroup();
+        rbCourse.setToggleGroup(group); rbPerm.setToggleGroup(group); rbOneTime.setToggleGroup(group);
+        cmbDay.getItems().addAll("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun");
+
+        // TEST VERİSİ ÜRETİMİ SİLİNDİ!
+        // Çünkü artık giriş yaptığın anda kullanıcının takvimi Database.java'dan dolu geliyor.
+
+        // Ekran boyutu hesaplandıktan sonra takvimi çizmek için Platform.runLater kullanılır
+        Platform.runLater(() -> renderCalendar());
+    }
+
+    // --- GECE / GÜNDÜZ MODU DEĞİŞİMİ ---
+    @FXML
+    public void toggleMode() {
+        isDayMode = !isDayMode;
+
+        if (isDayMode) {
+            modeBtn.setText("☼ Day Mode (8:00 - 18:00)");
+            modeBtn.getStyleClass().setAll("btn-mode");
+            mainContentArea.setStyle("-fx-background-color: white;");
+            setTextColor("#000000");
+        } else {
+            modeBtn.setText("☾ Night Mode (18:00 - 8:00)");
+            modeBtn.getStyleClass().setAll("btn-mode-night");
+            mainContentArea.setStyle("-fx-background-color: #111827;");
+            setTextColor("#FFFFFF"); // Beyaz metin
+        }
+        renderCalendar();
+    }
+
+    private void setTextColor(String colorHex) {
+        lblCourse.setStyle("-fx-text-fill: " + colorHex + "; -fx-font-weight: bold;");
+        lblPerm.setStyle("-fx-text-fill: " + colorHex + "; -fx-font-weight: bold;");
+        lblOneTime.setStyle("-fx-text-fill: " + colorHex + "; -fx-font-weight: bold;");
+    }
+
+    // --- TAKVİM ÇİZİM MATEMATİĞİ ---
+    private void renderCalendar() {
+        calendarGrid.getChildren().clear();
+        eventsOverlay.getChildren().clear();
+        daysHeader.getChildren().clear();
+
+        int startHour = isDayMode ? 8 : 18;
+        int endHour = isDayMode ? 18 : 32; // 32 = Ertesi sabah 8
+
+        // 1. Gün Başlıklarını (Mon, Tue...) Oluştur
+        String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+        double colWidth = (mainContentArea.getWidth() - 130) / 7;
+
+        for (String day : days) {
+            Label lblDay = new Label(day);
+            lblDay.setPrefWidth(colWidth);
+            lblDay.setAlignment(Pos.CENTER);
+            lblDay.setStyle("-fx-font-weight: bold; -fx-text-fill: " + (isDayMode ? "#000" : "#FFF") + ";");
+            daysHeader.getChildren().add(lblDay);
+        }
+
+        // 2. Arka Plan Izgarasını ve Saatleri Çiz
+        for (int i = startHour; i <= endHour; i++) {
+            HBox row = new HBox(10);
+            row.setAlignment(Pos.TOP_LEFT);
+            row.setPrefHeight(HOUR_HEIGHT);
+
+            String hourText = String.format("%02d:00", i % 24);
+            Label timeLabel = new Label(hourText);
+            timeLabel.setPrefWidth(50);
+            timeLabel.setStyle("-fx-text-fill: " + (isDayMode ? "#4B5563" : "#D1D5DB") + "; -fx-font-size: 12;");
+
+            Region line = new Region();
+            HBox.setHgrow(line, Priority.ALWAYS);
+            line.getStyleClass().add(isDayMode ? "calendar-line" : "calendar-line-night");
+
+            row.getChildren().addAll(timeLabel, line);
+            calendarGrid.getChildren().add(row);
+        }
+
+        User me = SessionManager.getCurrentUser();
+        if (me == null) return;
+
+        // 3. KULLANICININ KENDİ "PLAN"LARINI ÇİZİYORUZ
+        for (Plan plan : me.getCalendar().getPlans()) {
+            drawEventBox(
+                    plan.getTitle(),
+                    plan.getStartTime(),
+                    plan.getEndTime(),
+                    plan.getDate(),
+                    plan, // Plan objesini gönderiyoruz ki tipini anlayalım
+                    startHour, endHour, colWidth
+            );
+        }
+
+        // 4. KULLANICININ KATILDIĞI "AKTİVİTELERİ" DE TAKVİME ÇİZİYORUZ
+        for (Activity act : me.getCalendar().getActivities()) {
+            // Aktivitelerin bitiş saatini görsel olarak 1.5 saat sonrası kabul ediyoruz
+            drawEventBox(
+                    act.getActivityName(),
+                    act.getTime(),
+                    act.getTime().plusMinutes(90),
+                    act.getDate(),
+                    null, // Plan değil, Aktivite
+                    startHour, endHour, colWidth
+            );
+        }
+    }
+
+    // Ortak Kutu Çizim Metodu (Hem Plan hem Activity için)
+    private void drawEventBox(String title, LocalTime start, LocalTime end, LocalDate date, Plan planTypeObj, int viewStartHour, int viewEndHour, double colWidth) {
+
+        // LocalTime'ı ondalık sayıya çevir (Örn: 10:30 -> 10.5)
+        double startDecimal = start.getHour() + (start.getMinute() / 60.0);
+        double endDecimal = end.getHour() + (end.getMinute() / 60.0);
+
+        // Gece sarkmalarını düzeltme (Örn: Gece 01:00, 25.0 saat olarak algılanmalı)
+        if (startDecimal < 8 && !isDayMode) startDecimal += 24;
+        if (endDecimal < 8 && !isDayMode) endDecimal += 24;
+
+        // Etkinlik bu modun saatleri içindeyse çiz
+        if (startDecimal >= viewStartHour && startDecimal < viewEndHour) {
+
+            VBox box = new VBox(2);
+            box.setPrefWidth(colWidth - 10);
+
+            // Başlangıç Y ve Yükseklik hesaplama
+            double yOffset = (startDecimal - viewStartHour) * HOUR_HEIGHT;
+            double height = (endDecimal - startDecimal) * HOUR_HEIGHT;
+
+            // X (Sütun) hesaplama: Pazartesi=1, Pazar=7 -> Index=0'dan 6'ya
+            int dayIndex = date.getDayOfWeek().getValue() - 1;
+            double xOffset = 60 + (dayIndex * colWidth) + 5;
+
+            box.setLayoutX(xOffset);
+            box.setLayoutY(yOffset + 8);
+            box.setPrefHeight(height);
+
+            // --- OOP: SUBCLASS KONTROLÜ (instanceof) ---
+            if (planTypeObj instanceof CoursePlan) {
+                box.getStyleClass().add("event-course");
+            } else if (planTypeObj instanceof PermanentPlan) {
+                box.getStyleClass().add("event-permanent");
+            } else {
+                box.getStyleClass().add("event-onetime"); // Hem OneTimePlan hem de Activity'ler turuncu olsun
+            }
+
+            // İçindeki metinler
+            Label nameLbl = new Label(title);
+            nameLbl.setStyle("-fx-font-weight: bold; -fx-text-fill: white;");
+
+            String timeText = String.format("%02d:%02d - %02d:%02d", start.getHour(), start.getMinute(), end.getHour(), end.getMinute());
+            Label timeLbl = new Label(timeText);
+            timeLbl.setStyle("-fx-text-fill: white; -fx-font-size: 10;");
+
+            box.getChildren().addAll(nameLbl, timeLbl);
+            eventsOverlay.getChildren().add(box);
+        }
+    }
+
+    // --- POP-UP İŞLEMLERİ (Yeni Plan Ekleme) ---
+    @FXML public void showAddPlanPopup() { overlay.setVisible(true); addPlanPopup.setVisible(true); }
+    @FXML public void hidePopup() { overlay.setVisible(false); addPlanPopup.setVisible(false); }
+
+    @FXML
+    public void addNewPlan() {
+        try {
+            String name = inpName.getText();
+
+            // "14:30" formatını senin LocalTime objene çeviriyoruz
+            String[] startParts = inpStart.getText().split(":");
+            String[] endParts = inpEnd.getText().split(":");
+            LocalTime startTime = LocalTime.of(Integer.parseInt(startParts[0].trim()), Integer.parseInt(startParts[1].trim()));
+            LocalTime endTime = LocalTime.of(Integer.parseInt(endParts[0].trim()), Integer.parseInt(endParts[1].trim()));
+
+            // Seçilen günü LocalDate objesine dönüştürüyoruz (İçinde bulunduğumuz haftaya göre)
+            int dayIndex = cmbDay.getSelectionModel().getSelectedIndex() + 1; // 1=Mon, 7=Sun
+            LocalDate planDate = LocalDate.now().with(DayOfWeek.of(dayIndex));
+
+            String planId = "P" + System.currentTimeMillis();
+            Plan newPlan;
+
+            // Polymorphism: Seçime göre alt sınıflardan obje yaratıyoruz!
+            if (rbPerm.isSelected()) {
+                newPlan = new PermanentPlan(planId, name, planDate, startTime, endTime);
+            } else if (rbOneTime.isSelected()) {
+                newPlan = new OneTimePlan(planId, name, planDate, startTime, endTime);
+            } else {
+                newPlan = new CoursePlan(planId, name, planDate, startTime, endTime);
+            }
+
+            User me = SessionManager.getCurrentUser();
+
+            // Kullanıcının takvimine ekle
+            me.getCalendar().addPlan(newPlan);
+
+            // GERÇEK UYGULAMA MANTIĞI: Değişikliği Veritabanına da Kaydet!
+            Database.getInstance().saveUser(me);
+
+            hidePopup();
+            renderCalendar(); // Eklediğimiz an takvim yenilenir!
+
+        } catch (Exception e) {
+            System.out.println("HATA: Saat formatı hatalı girildi (örn: 14:00 şeklinde girin)");
+            e.printStackTrace();
+        }
+    }
+
+    // --- MENÜ GEÇİŞLERİ ---
+    @FXML public void goToProfile(ActionEvent event) throws IOException { switchScene(event, "profilePage.fxml"); }
+    @FXML public void goToFriend(ActionEvent event) throws IOException { switchScene(event, "friendsPage.fxml"); }
+    @FXML public void goToHome(ActionEvent event) throws IOException { switchScene(event, "mainPage.fxml"); }
+    @FXML public void goToActivities(ActionEvent event) throws IOException { switchScene(event, "activityPage.fxml"); }
+
+    private void switchScene(ActionEvent event, String fxmlFile) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+        Parent root = loader.load();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setScene(new Scene(root, 900, 600));
+        stage.show();
+    }
+}

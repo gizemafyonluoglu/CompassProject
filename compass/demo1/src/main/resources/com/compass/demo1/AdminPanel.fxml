@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<HBox prefHeight="650.0" prefWidth="1000.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.compass.demo1.AdminPanelController">
+    <children>
+        <VBox alignment="TOP_CENTER" prefWidth="80.0" spacing="35.0" style="-fx-background-color: white; -fx-padding: 30 0 0 0; -fx-border-color: #F1F5F9; -fx-border-width: 0 1 0 0;">
+            <children>
+                <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#goToProfile" pickOnBounds="true" preserveRatio="true" styleClass="nav-icon"><image><Image url="@icons/profile.png" /></image></ImageView>
+                <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#goToFriend" pickOnBounds="true" preserveRatio="true" styleClass="nav-icon"><image><Image url="@icons/friend.png" /></image></ImageView>
+                <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#goToHome" pickOnBounds="true" preserveRatio="true" styleClass="nav-icon"><image><Image url="@icons/home.png" /></image></ImageView>
+                <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#goToActivities" pickOnBounds="true" preserveRatio="true" styleClass="nav-icon"><image><Image url="@icons/activity.png" /></image></ImageView>
+                <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#goToCalendar" pickOnBounds="true" preserveRatio="true" styleClass="nav-icon"><image><Image url="@icons/calendar.png" /></image></ImageView>
+
+                <VBox fx:id="adminNav" alignment="CENTER" visible="true">
+                    <VBox.margin><Insets top="10.0" /></VBox.margin>
+                    <children>
+                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" styleClass="nav-icon-active">
+                            <image><Image url="@icons/admin.png" /></image>
+                        </ImageView>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+
+        <VBox HBox.hgrow="ALWAYS" spacing="20.0" style="-fx-background-color: #F8FAFC; -fx-padding: 40 50 40 50;">
+            <children>
+                <Label style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #8A2BE2;" text="Admin Panel" />
+
+                <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: #F8FAFC;" VBox.vgrow="ALWAYS">
+                    <content>
+                        <TilePane fx:id="requestsContainer" hgap="30.0" prefColumns="2" vgap="30.0">
+                            <padding>
+                                <Insets bottom="20.0" left="10.0" right="10.0" top="20.0" />
+                            </padding>
+                        </TilePane>
+                    </content>
+                </ScrollPane>
+            </children>
+        </VBox>
+    </children>
+</HBox>

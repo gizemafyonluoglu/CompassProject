@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="600.0" prefWidth="900.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.compass.demo1.MainController">
+
+    <left>
+        <VBox alignment="TOP_CENTER" prefWidth="80.0" spacing="20.0" style="-fx-background-color: #F8F9FA; -fx-border-color: #E5E7EB; -fx-border-width: 0 1 0 0;">
+            <padding>
+                <Insets top="30.0" />
+            </padding>
+            <children>
+                <Button fx:id="profileBtn" onAction="#goToProfile" styleClass="sidebar-button">
+                    <graphic>
+                        <ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@icons/profile.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+
+                <Button fx:id="friendBtn" onAction="#goToFriends" styleClass="sidebar-button">
+                    <graphic>
+                        <ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@icons/friend.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+
+                <Button fx:id="homeBtn" styleClass="sidebar-button-active">
+                    <graphic>
+                        <ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@icons/home.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+
+                <Button fx:id="createBtn" onAction="#goToActivity" styleClass="sidebar-button">
+                    <graphic>
+                        <ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@icons/activity.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+
+                <Button fx:id="calendarBtn" onAction="#goToCalendar" styleClass="sidebar-button">
+                    <graphic>
+                        <ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@icons/calendar.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </children>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="20.0" style="-fx-background-color: white;">
+            <padding><Insets bottom="20.0" left="40.0" right="40.0" top="20.0" /></padding>
+            <children>
+                <Label style="-fx-font-size: 42; -fx-font-weight: bold; -fx-text-fill: #8A2BE2;" text="COMPASS" />
+                <Separator prefWidth="200.0" style="-fx-background-color: #8A2BE2; -fx-opacity: 0.5;" />
+
+                <GridPane hgap="10.0">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="30.0" />
+                        <ColumnConstraints percentWidth="30.0" />
+                        <ColumnConstraints percentWidth="15.0" />
+                        <ColumnConstraints percentWidth="15.0" />
+                        <ColumnConstraints percentWidth="10.0" />
+                    </columnConstraints>
+                    <children>
+                        <Label style="-fx-font-weight: bold; -fx-text-fill: #6B7280;" text="Activity" />
+                        <Label style="-fx-font-weight: bold; -fx-text-fill: #6B7280;" text="Place" GridPane.columnIndex="1" />
+                        <Label style="-fx-font-weight: bold; -fx-text-fill: #6B7280;" text="Date" GridPane.columnIndex="2" />
+                        <Label style="-fx-font-weight: bold; -fx-text-fill: #6B7280;" text="Time" GridPane.columnIndex="3" />
+                        <Label style="-fx-font-weight: bold; -fx-text-fill: #6B7280;" text="Quota" GridPane.columnIndex="4" />
+                    </children>
+               <rowConstraints>
+                  <RowConstraints />
+               </rowConstraints>
+                </GridPane>
+
+                <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+                    <content>
+                        <VBox fx:id="activityContainer" spacing="15.0">
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

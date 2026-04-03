@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane prefHeight="600.0" prefWidth="900.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.compass.demo1.LoginController">
+    <children>
+
+        <HBox alignment="CENTER" spacing="100.0">
+            <children>
+                <VBox alignment="CENTER_LEFT" spacing="10.0">
+                    <children>
+                        <Label style="-fx-font-size: 50; -fx-font-weight: bold; -fx-text-fill: #8A2BE2;" text="COMPASS" />
+                        <Label style="-fx-font-size: 18; -fx-text-fill: #6B7280;" text="from interest to interactions" />
+                    </children>
+                </VBox>
+                <VBox prefWidth="380.0" spacing="20.0" styleClass="card">
+                    <padding><Insets bottom="40.0" left="30.0" right="30.0" top="40.0" /></padding>
+                    <children>
+                        <Label style="-fx-font-size: 24; -fx-font-weight: bold;" text="Welcome Back" />
+                        <VBox spacing="5.0">
+                            <Label style="-fx-font-weight: bold;" text="Email" />
+                            <TextField fx:id="loginEmailField" promptText="you@ug.bilkent.edu.tr" styleClass="text-field" />
+                        </VBox>
+                        <VBox spacing="5.0">
+                            <Label style="-fx-font-weight: bold;" text="Password" />
+                            <PasswordField fx:id="loginPasswordField" promptText="********" styleClass="text-field" />
+                        </VBox>
+                        <HBox spacing="15.0">
+                            <children>
+                                <Button maxWidth="Infinity" onAction="#handleSignIn" prefHeight="40.0" styleClass="button-primary" text="Sign In" HBox.hgrow="ALWAYS" />
+                                <Button maxWidth="Infinity" onAction="#showSignUp" prefHeight="40.0" styleClass="button-secondary" text="Sign Up" HBox.hgrow="ALWAYS" />
+                            </children>
+                        </HBox>
+                        <Button maxWidth="Infinity" onAction="#showForgotPassword" style="-fx-background-color: transparent; -fx-text-fill: #8A2BE2; -fx-cursor: hand;" text="Forgot your password?" />
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+
+        <Pane fx:id="overlay" onMouseClicked="#hideAll" style="-fx-background-color: rgba(0,0,0,0.5);" visible="false" />
+
+        <VBox fx:id="signUpBox" maxWidth="450.0" spacing="15.0" styleClass="card" visible="false">
+            <padding><Insets bottom="30.0" left="30.0" right="30.0" top="30.0" /></padding>
+            <children>
+                <Label styleClass="label-title" text="Create Account" />
+                <TextField fx:id="signUpNameField" promptText="Name" styleClass="text-field" />
+                <TextField fx:id="signUpSurnameField" promptText="Surname" styleClass="text-field" />
+                <TextField fx:id="signUpEmailField" promptText="you@ug.bilkent.edu.tr" styleClass="text-field" />
+                <PasswordField fx:id="signUpPass" promptText="Password" styleClass="text-field" />
+                <PasswordField fx:id="signUpPassAgain" promptText="Password again" styleClass="text-field" />
+                <Label fx:id="signUpErrorLabel" style="-fx-text-fill: #EF4444; -fx-font-size: 12;" text="" visible="false" />
+                <Button maxWidth="Infinity" onAction="#showInterests" styleClass="button-secondary" text="Select Your Interests" />
+                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                    <children>
+                        <Button onAction="#hideAll" prefWidth="80.0" styleClass="button-secondary" text="Cancel" />
+                        <Button onAction="#handleCreateAccount" prefWidth="120.0" styleClass="button-primary" text="Create Account" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+        <VBox fx:id="interestsBox" maxWidth="500.0" spacing="20.0" styleClass="card" visible="false">
+            <padding><Insets bottom="30.0" left="30.0" right="30.0" top="30.0" /></padding>
+            <children>
+                <Label styleClass="label-title" text="Select Your Interests" />
+                <FlowPane hgap="10.0" vgap="10.0">
+                    <children>
+                        <Button onAction="#toggleInterest" styleClass="interest-button" text="Gaming" />
+                        <Button onAction="#toggleInterest" styleClass="interest-button" text="Engineering" />
+                        <Button onAction="#toggleInterest" styleClass="interest-button" text="Music" />
+                        <Button onAction="#toggleInterest" styleClass="interest-button" text="Arts" />
+                        <Button onAction="#toggleInterest" styleClass="interest-button" text="Sports" />
+                        <Button onAction="#toggleInterest" styleClass="interest-button" text="Cinema" />
+                    </children>
+                </FlowPane>
+                <HBox alignment="CENTER_RIGHT">
+                    <Button onAction="#hideInterests" prefWidth="80.0" styleClass="button-primary" text="OK" />
+                </HBox>
+            </children>
+        </VBox>
+
+        <VBox fx:id="forgotPasswordBox" maxWidth="450.0" spacing="15.0" styleClass="card" visible="false">
+            <padding><Insets bottom="30.0" left="30.0" right="30.0" top="30.0" /></padding>
+            <children>
+                <Label styleClass="label-title" text="Reset Password" />
+                <Label style="-fx-text-fill: #6B7280;" text="Enter your email to get your verification code." />
+                <TextField fx:id="forgotPassEmailField" promptText="you@ug.bilkent.edu.tr" styleClass="text-field" />
+                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                    <children>
+                        <Button onAction="#hideAll" styleClass="button-secondary" text="Cancel" />
+                        <Button onAction="#handleForgotPassword" prefWidth="80.0" styleClass="button-primary" text="OK" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+        <VBox fx:id="verificationBox" maxWidth="450.0" spacing="15.0" styleClass="card" visible="false">
+            <padding><Insets bottom="30.0" left="30.0" right="30.0" top="30.0" /></padding>
+            <children>
+                <Label styleClass="label-title" text="Verification" />
+                <Label style="-fx-text-fill: #6B7280;" text="Please enter the verification code sent to your email." />
+                <TextField fx:id="verificationCodeField" promptText="Enter verification code" styleClass="text-field" />
+                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                    <children>
+                        <Button onAction="#hideAll" styleClass="button-secondary" text="Cancel" />
+                        <Button onAction="#handleVerifyCode" prefWidth="80.0" styleClass="button-primary" text="OK" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+        <VBox fx:id="setPasswordBox" maxWidth="450.0" spacing="15.0" styleClass="card" visible="false">
+            <padding><Insets bottom="30.0" left="30.0" right="30.0" top="30.0" /></padding>
+            <children>
+                <Label styleClass="label-title" text="Set New Password" />
+                <PasswordField fx:id="newPass" promptText="New Password" styleClass="text-field" />
+                <PasswordField fx:id="confirmPass" promptText="Confirm New Password" styleClass="text-field" />
+                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                    <Label fx:id="errorLabel" style="-fx-text-fill: #EF4444; -fx-font-size: 12;" text="" visible="false" />
+                    <children>
+                        <Button onAction="#hideAll" styleClass="button-secondary" text="Cancel" />
+                        <Button onAction="#handleUpdatePassword" prefWidth="150.0" styleClass="button-primary" text="Update Password" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+    </children>
+</StackPane>
