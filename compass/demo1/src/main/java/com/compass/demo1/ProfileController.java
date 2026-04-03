@@ -17,9 +17,12 @@ import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 public class ProfileController {
@@ -47,12 +50,13 @@ public class ProfileController {
 
         if (currentUser != null) {
             nameTextField.setText(currentUser.getName() + " " + currentUser.getSurname());
-
-            // Profil fotoğrafı path'i varsa yükle
-            // if (currentUser.getProfilePhotoPath() != null && !currentUser.getProfilePhotoPath().isEmpty()) {
-            //    profileImageView.setImage(new Image(currentUser.getProfilePhotoPath()));
-            //    defaultUserIcon.setVisible(false);
-            // }
+            String base64 = currentUser.getProfilePhotoBase64();
+            if (base64 != null && !base64.isEmpty()) {
+                byte[] imageBytes = Base64.getDecoder().decode(base64);
+                Image img = new Image(new ByteArrayInputStream(imageBytes));
+                profileImageView.setImage(img);
+                defaultUserIcon.setVisible(false);
+            }
         }
 
         renderInterestsDisplay();
@@ -117,16 +121,7 @@ public class ProfileController {
         }
 
         User me = SessionManager.getCurrentUser();
-
-        // Not: Eğer User sınıfında setInterests() metodu yoksa, "interests" listesini public yapman
-        // veya updateInterests gibi bir metot eklemen gerekebilir. Standart olarak setInterests farz ediyoruz.
-        // me.setInterests(newInterests);
-
-        // Alternatif (Listeyi temizleyip yeniden ekleme):
         me.updateInterests(newInterests);
-        Database.getInstance().saveUser(me);
-
-        // SİHRİN GERÇEKLEŞTİĞİ YER: Değişiklikleri Veritabanına Kaydet!
         Database.getInstance().saveUser(me);
 
         renderInterestsDisplay();
@@ -141,14 +136,22 @@ public class ProfileController {
         File selectedFile = fileChooser.showOpenDialog(stage);
 
         if (selectedFile != null) {
-            String path = selectedFile.toURI().toString();
-            profileImageView.setImage(new Image(path));
-            defaultUserIcon.setVisible(false);
+            try {
 
-            // User nesnesini güncelle ve veritabanına kaydet
-            User me = SessionManager.getCurrentUser();
-            // me.setProfilePhotoPath(path); // Eğer User'da bu metot varsa açabilirsin
-            Database.getInstance().saveUser(me);
+                byte[] fileBytes = Files.readAllBytes(selectedFile.toPath());
+                String base64String = Base64.getEncoder().encodeToString(fileBytes);
+                Image img = new Image(new ByteArrayInputStream(fileBytes));
+                profileImageView.setImage(img);
+                defaultUserIcon.setVisible(false);
+                User me = SessionManager.getCurrentUser();
+                me.setProfilePhotoBase64(base64String);
+                Database.getInstance().saveUser(me);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Fotoğraf yüklenirken hata oluştu!", ButtonType.OK);
+                alert.showAndWait();
+            }
         }
     }
 
@@ -171,8 +174,6 @@ public class ProfileController {
             hideAllPopups();
             fileNameLabel.setText("Upload a file...");
             fileNameLabel.setStyle("-fx-text-fill: #9CA3AF;");
-
-            // İleride burada Database'e yeni bir MembershipRequest kaydedilebilir.
         }
     }
 
@@ -195,13 +196,12 @@ public class ProfileController {
 
     @FXML
     public void hideAllPopups() {
-        if(overlay != null) overlay.setVisible(false);
-        if(signOutPopup != null) signOutPopup.setVisible(false);
-        if(boardMembershipPopup != null) boardMembershipPopup.setVisible(false);
-        if(interestsPopup != null) interestsPopup.setVisible(false);
+        if (overlay != null) overlay.setVisible(false);
+        if (signOutPopup != null) signOutPopup.setVisible(false);
+        if (boardMembershipPopup != null) boardMembershipPopup.setVisible(false);
+        if (interestsPopup != null) interestsPopup.setVisible(false);
     }
 
-    // --- MENÜ GEÇİŞLERİ ---
     @FXML public void goToHome(ActionEvent event) throws IOException { switchScene(event, "/com/compass/demo1/mainPage.fxml"); }
     @FXML public void goToFriends(ActionEvent event) throws IOException { switchScene(event, "/com/compass/demo1/friendsPage.fxml"); }
     @FXML public void goToActivity(ActionEvent event) throws IOException { switchScene(event, "/com/compass/demo1/activityPage.fxml"); }

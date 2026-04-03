@@ -12,6 +12,7 @@ public class User {
     private String password;
     private String biography;
     private String profilePhotoPath;
+    private String profilePhotoBase64;  
     private boolean isVerified;
     private boolean availabilityVisible;
     private List<User> friends;
@@ -29,6 +30,7 @@ public class User {
         this.password = password;
         this.biography = "";
         this.profilePhotoPath = "";
+        this.profilePhotoBase64 = "";
         this.isVerified = false;
         this.availabilityVisible = true;
         this.friends = new ArrayList<>();
@@ -52,7 +54,7 @@ public class User {
     public void blockUser(User user) {
         if (user != null && !user.equals(this) && !blockedUsers.contains(user)) {
             blockedUsers.add(user);
-            friends.remove(user); 
+            friends.remove(user);
         }
     }
 
@@ -72,103 +74,111 @@ public class User {
         this.interests = new ArrayList<>(interests);
     }
 
-    public String getUserId() { 
-        return userId; 
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUserId(String userId) { 
-        this.userId = userId; 
-    }
- 
-    public String getName() { 
-        return name; 
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
-    public void setName(String name) { 
-        this.name = name; 
+    public String getName() {
+        return name;
     }
- 
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getSurname() {
-        return surname; 
+        return surname;
     }
 
-    public void setSurname(String surname) { 
-        this.surname = surname; 
-    }
- 
-    public String getEmail() { 
-        return email; 
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 
-    public void setEmail(String email) { 
-        this.email = email; 
-    }
- 
-    public String getPassword() { 
-        return password; 
+    public String getEmail() {
+        return email;
     }
 
-    public void setPassword(String password) { 
-        this.password = password; 
-    }
- 
-    public String getBiography() { 
-        return biography; 
-    }
- 
-    public String getProfilePhotoPath() { 
-        return profilePhotoPath; 
-    }
- 
-    public boolean isVerified() { 
-        return isVerified; 
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public void setVerified(boolean verified) { 
-        isVerified = verified; 
+    public String getPassword() {
+        return password;
     }
- 
-    public boolean isAvailabilityVisible() { 
-        return availabilityVisible; 
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getBiography() {
+        return biography;
+    }
+
+    public String getProfilePhotoPath() {
+        return profilePhotoPath;
+    }
+    public String getProfilePhotoBase64() {
+        return profilePhotoBase64;
+    }
+
+    public void setProfilePhotoBase64(String profilePhotoBase64) {
+        this.profilePhotoBase64 = profilePhotoBase64;
+    }
+
+    public boolean isVerified() {
+        return isVerified;
+    }
+
+    public void setVerified(boolean verified) {
+        isVerified = verified;
+    }
+
+    public boolean isAvailabilityVisible() {
+        return availabilityVisible;
     }
 
     public void setAvailabilityVisible(boolean availabilityVisible) {
         this.availabilityVisible = availabilityVisible;
     }
- 
-    public List<User> getFriends() { 
-        return new ArrayList<>(friends); 
-    }
- 
-    public List<User> getBlockedUsers() { 
-        return new ArrayList<>(blockedUsers); 
-    }
- 
-    public List<Interest> getInterests() { 
-        return new ArrayList<>(interests); 
-    }
- 
-    public Calendar getCalendar() { 
-        return calendar; 
-    }
-    public void setCalendar(Calendar calendar) { 
-        this.calendar = calendar; 
-    }
- 
-    public List<Activity> getCreatedActivities() { 
-        return new ArrayList<>(createdActivities); 
+
+    public List<User> getFriends() {
+        return new ArrayList<>(friends);
     }
 
-    public void setCreatedActivities(List<Activity> createdActivities) { 
-        this.createdActivities =  new ArrayList<>(createdActivities);
+    public List<User> getBlockedUsers() {
+        return new ArrayList<>(blockedUsers);
     }
 
-    public List<Activity> getAttendedActivities() { 
-        return new ArrayList<>(attendedActivities); 
+    public List<Interest> getInterests() {
+        return new ArrayList<>(interests);
     }
 
-    public void setAttendedActivities(List<Activity> attendedActivities) { 
-        this.attendedActivities =  new ArrayList<>(attendedActivities); 
+    public Calendar getCalendar() {
+        return calendar;
+    }
+
+    public void setCalendar(Calendar calendar) {
+        this.calendar = calendar;
+    }
+
+    public List<Activity> getCreatedActivities() {
+        return new ArrayList<>(createdActivities);
+    }
+
+    public void setCreatedActivities(List<Activity> createdActivities) {
+        this.createdActivities = new ArrayList<>(createdActivities);
+    }
+
+    public List<Activity> getAttendedActivities() {
+        return new ArrayList<>(attendedActivities);
+    }
+
+    public void setAttendedActivities(List<Activity> attendedActivities) {
+        this.attendedActivities = new ArrayList<>(attendedActivities);
     }
 
     @Override
@@ -178,7 +188,7 @@ public class User {
         User other = (User) obj;
         return userId != null && userId.equals(other.userId);
     }
- 
+
     @Override
     public int hashCode() {
         return userId != null ? userId.hashCode() : 0;

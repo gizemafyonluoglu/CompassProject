@@ -11,20 +11,21 @@ import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.*;
 
 public class Database {
-    // baglayıvı variable zımbırtıları
     private static Database instance;
     private MongoClient mongoClient;
     private MongoDatabase database;
     private MongoCollection<Document> usersCol;
     private MongoCollection<Document> activitiesCol;
+    private MongoCollection<Document> plansCol;
     private MongoCollection<Document> membershipCol;
-     private MongoCollection<Document> interestsCol;
-    //constuctor
+    private MongoCollection<Document> interestsCol;
+
     private Database() {
         mongoClient = MongoClients.create(MongoConfig.CONNECTION_URI);
         database = mongoClient.getDatabase(MongoConfig.DATABASE_NAME);
         usersCol = database.getCollection("users");
         activitiesCol = database.getCollection("activities");
+        plansCol = database.getCollection("plans");
         membershipCol = database.getCollection("membership_requests");
         interestsCol = database.getCollection("interests");
         createIndexes();
@@ -44,10 +45,9 @@ public class Database {
     private void createIndexes() {
         usersCol.createIndex(Indexes.ascending("email"), new IndexOptions().unique(true));
         activitiesCol.createIndex(Indexes.text("activityName"));
+        plansCol.createIndex(Indexes.ascending("ownerUserId"));
         membershipCol.createIndex(Indexes.ascending("status"));
     }
-
-    // kullanıcı kısımları
 
     public void saveUser(User user) {
         if (user == null) {
@@ -122,8 +122,6 @@ public class Database {
         usersCol.deleteOne(eq("userId", userId));
     }
 
-    // aktiviteler kısmı
-
     public void saveActivity(Activity activity) {
         if (activity == null) {
             return;
@@ -154,7 +152,6 @@ public class Database {
         return documentToActivity(doc);
     }
 
-    
     public void removeActivity(String activityId) {
         if (activityId == null) {
             return;
@@ -195,6 +192,35 @@ public class Database {
         return result;
     }
 
+    public void savePlan(Plan plan) {
+        if (plan == null) {
+            return;
+        }
+        Document doc = planToDocument(plan);
+        plansCol.replaceOne(eq("planId", plan.getPlanId()), doc, new ReplaceOptions().upsert(true));
+    }
+
+    public List<Plan> getPlans(String ownerUserId) {
+        List<Plan> plans = new ArrayList<>();
+        if (ownerUserId == null) {
+            return plans;
+        }
+        for (Document doc : plansCol.find(eq("ownerUserId", ownerUserId))) {
+            Plan p = documentToPlan(doc);
+            if (p != null) {
+                plans.add(p);
+            }
+        }
+        return plans;
+    }
+
+    public void removePlan(String planId) {
+        if (planId == null) {
+            return;
+        }
+        plansCol.deleteOne(eq("planId", planId));
+    }
+
     public void saveMembershipRequest(MembershipRequest request) {
         if (request == null) {
             return;
@@ -225,15 +251,12 @@ public class Database {
         return requests;
     }
 
-    
     public void updateRequestStatus(String requestId, String status) {
         if (requestId == null || status == null) {
             return;
         }
         membershipCol.updateOne(eq("requestId", requestId), set("status", status));
     }
-
-    // ilgi
 
     public void saveInterest(Interest interest) {
         if (interest == null) {
@@ -255,51 +278,6 @@ public class Database {
         return interests;
     }
 
-    private Document calendarToDocument(Calendar calendar) {
-        if (calendar == null) {
-            return null;
-        }
-
-        List<Document> planDocs = new ArrayList<>();
-        for (Plan plan : calendar.getPlans()) {
-            if (plan != null) {
-                planDocs.add(planToDocument(plan));
-            }
-        }
-
-        Document calendarDoc = new Document();
-        calendarDoc.append("calendarId", calendar.getCalendarId());
-        calendarDoc.append("plans", planDocs);
-
-        return calendarDoc;
-    }
-
-    private Calendar documentToCalendar(Document doc) {
-        if (doc == null) {
-            return new Calendar();
-        }
-
-        Calendar calendar = new Calendar();
-
-        String calendarId = doc.getString("calendarId");
-        calendar.setCalendarId(calendarId);
-
-        List<Plan> plans = new ArrayList<>();
-        List<Document> planDocs = doc.getList("plans", Document.class);
-
-        if (planDocs != null) {
-            for (Document planDoc : planDocs) {
-                Plan plan = documentToPlan(planDoc);
-                if (plan != null) {
-                    plans.add(plan);
-                }
-            }
-        }
-
-        calendar.setPlans(plans);
-        return calendar;
-    }
-    
     private Document userToDocument(User user) {
         List<String> friendIds = new ArrayList<>();
         for (User f : user.getFriends()) {
@@ -325,7 +303,12 @@ public class Database {
         for (Activity a : user.getAttendedActivities()) {
             attendedIds.add(a.getActivityId());
         }
-        
+
+        String calendarId = null;
+        if (user.getCalendar() != null) {
+            calendarId = user.getCalendar().getCalendarId();
+        }
+
         Document doc = new Document();
         doc.append("userId", user.getUserId());
         doc.append("name", user.getName());
@@ -333,7 +316,7 @@ public class Database {
         doc.append("email", user.getEmail());
         doc.append("password", user.getPassword());
         doc.append("biography", user.getBiography());
-        doc.append("profilePhotoPath", user.getProfilePhotoPath());
+        doc.append("profilePhotoBase64", user.getProfilePhotoBase64());  
         doc.append("isVerified", user.isVerified());
         doc.append("availabilityVisible", user.isAvailabilityVisible());
         doc.append("friendIds", friendIds);
@@ -341,7 +324,7 @@ public class Database {
         doc.append("interestIds", interestIds);
         doc.append("createdActivityIds", createdIds);
         doc.append("attendedActivityIds", attendedIds);
-        doc.append("calendar", calendarToDocument(user.getCalendar()));
+        doc.append("calendarId", calendarId);
 
         if (user instanceof Admin) {
             doc.append("userType", "Admin");
@@ -406,20 +389,142 @@ public class Database {
         if (bio != null && !bio.isEmpty()) {
             user.updateBiography(bio);
         }
-
-        String photo = doc.getString("profilePhotoPath");
-        if (photo != null && !photo.isEmpty()) {
-            user.updateProfilePhoto(photo);
+        String photoBase64 = doc.getString("profilePhotoBase64");
+        if (photoBase64 != null && !photoBase64.isEmpty()) {
+            user.setProfilePhotoBase64(photoBase64);
         }
 
-        Document calendarDoc = doc.get("calendar", Document.class);
-        if (calendarDoc != null) {
-            user.setCalendar(documentToCalendar(calendarDoc));
+        List<String> interestIds = doc.getList("interestIds", String.class);
+        if (interestIds != null) {
+            List<Interest> allInterests = getAllInterests();
+            List<Interest> userInterests = new ArrayList<>();
+            for (String iid : interestIds) {
+                for (Interest interest : allInterests) {
+                    if (interest.getInterestId().equals(iid)) {
+                        userInterests.add(interest);
+                        break;
+                    }
+                }
+            }
+            user.updateInterests(userInterests);
+        }
+
+        List<String> createdIds = doc.getList("createdActivityIds", String.class);
+        if (createdIds != null) {
+            List<Activity> createdActivities = new ArrayList<>();
+            for (String aid : createdIds) {
+                Activity a = getActivityByIdLight(aid);
+                if (a != null) {
+                    createdActivities.add(a);
+                }
+            }
+            user.setCreatedActivities(createdActivities);
+        }
+
+        List<String> attendedIds = doc.getList("attendedActivityIds", String.class);
+        if (attendedIds != null) {
+            List<Activity> attendedActivities = new ArrayList<>();
+            for (String aid : attendedIds) {
+                Activity a = getActivityByIdLight(aid);
+                if (a != null) {
+                    attendedActivities.add(a);
+                }
+            }
+            user.setAttendedActivities(attendedActivities);
+        }
+
+        String calendarId = doc.getString("calendarId");
+        Calendar cal;
+        if (calendarId != null) {
+            cal = new Calendar(calendarId);
         } else {
-            user.setCalendar(new Calendar());
+            cal = new Calendar();
         }
+        List<Plan> plans = getPlans(userId);
+        cal.setPlans(plans);
+        for (Activity a : user.getAttendedActivities()) {
+            cal.addActivity(a);
+        }
+        for (Activity a : user.getCreatedActivities()) {
+            cal.addActivity(a);
+        }
+        user.setCalendar(cal);
 
         return user;
+    }
+
+    private Activity getActivityByIdLight(String activityId) {
+        if (activityId == null) {
+            return null;
+        }
+        Document doc = activitiesCol.find(eq("activityId", activityId)).first();
+        if (doc == null) {
+            return null;
+        }
+        return documentToActivityLight(doc);
+    }
+
+    private Activity documentToActivityLight(Document doc) {
+        if (doc == null) {
+            return null;
+        }
+
+        String activityId = doc.getString("activityId");
+        String activityName = doc.getString("activityName");
+        String description = doc.getString("description");
+        String category = doc.getString("category");
+        String place = doc.getString("place");
+        int quota = doc.getInteger("quota", 0);
+        String visibility = doc.getString("visibility");
+        String activityType = doc.getString("activityType");
+
+        LocalDate date = null;
+        if (doc.getString("date") != null) {
+            date = LocalDate.parse(doc.getString("date"));
+        }
+
+        LocalTime time = null;
+        if (doc.getString("time") != null) {
+            time = LocalTime.parse(doc.getString("time"));
+        }
+
+        Activity activity;
+        String activityClass = doc.getString("activityClass");
+
+        if ("ClubActivity".equals(activityClass)) {
+            String clubName = doc.getString("clubName");
+            boolean isOfficial = false;
+            Boolean officialVal = doc.getBoolean("isOfficialClubEvent");
+            if (officialVal != null && officialVal) {
+                isOfficial = true;
+            }
+            activity = new ClubActivity(activityId, activityName, description, category, place, date, time, quota, visibility, activityType, clubName, isOfficial);
+        } else {
+            activity = new Activity(activityId, activityName, description, category, place, date, time, quota, visibility, activityType);
+        }
+
+        Boolean cancelled = doc.getBoolean("isCancelled");
+        if (cancelled != null && cancelled) {
+            activity.cancelActivity();
+        }
+
+        List<String> joinedUserIds = doc.getList("joinedUserIds", String.class);
+        if (joinedUserIds != null) {
+            for (String odUserId : joinedUserIds) {
+                Document userDoc = usersCol.find(eq("userId", odUserId)).first();
+                if (userDoc != null) {
+                    String uid = userDoc.getString("userId");
+                    String uname = userDoc.getString("name");
+                    String usurname = userDoc.getString("surname");
+                    String uemail = userDoc.getString("email");
+                    String upass = userDoc.getString("password");
+                    User participant = new User(uid, uname, usurname, uemail, upass);
+                    activity.addParticipant(participant);
+                }
+            }
+        }
+
+        return activity;
     }
 
     private Document activityToDocument(Activity activity) {
@@ -507,10 +612,25 @@ public class Database {
         if (cancelled != null && cancelled) {
             activity.cancelActivity();
         }
+        List<String> joinedUserIds = doc.getList("joinedUserIds", String.class);
+        if (joinedUserIds != null) {
+            for (String odUserId : joinedUserIds) {
+                Document userDoc = usersCol.find(eq("userId", odUserId)).first();
+                if (userDoc != null) {
+                    String uid = userDoc.getString("userId");
+                    String uname = userDoc.getString("name");
+                    String usurname = userDoc.getString("surname");
+                    String uemail = userDoc.getString("email");
+                    String upass = userDoc.getString("password");
+                    User participant = new User(uid, uname, usurname, uemail, upass);
+                    activity.addParticipant(participant);
+                }
+            }
+        }
 
         return activity;
     }
-    //planlar
+
     private Document planToDocument(Plan plan) {
         String dateStr = null;
         if (plan.getDate() != null) {
@@ -529,6 +649,7 @@ public class Database {
 
         Document doc = new Document();
         doc.append("planId", plan.getPlanId());
+        doc.append("ownerUserId", plan.getOwnerUserId());
         doc.append("title", plan.getTitle());
         doc.append("date", dateStr);
         doc.append("startTime", startStr);

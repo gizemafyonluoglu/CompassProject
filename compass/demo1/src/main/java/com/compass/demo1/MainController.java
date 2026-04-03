@@ -106,7 +106,7 @@ public class MainController {
         lblDate.getStyleClass().add("badge-orange");
         lblDate.setPrefWidth(100);
 
-        // Saat bitişi için görsel olarak 1.5 saat ekleyelim
+        
         String timeStr = act.getTime().toString() + " - " + act.getTime().plusMinutes(90).toString();
         Label lblTime = new Label(timeStr);
         lblTime.getStyleClass().add("badge-green");
@@ -129,7 +129,7 @@ public class MainController {
         // 6. Buton Tıklama Mantığı
         actionBtn.setOnAction(e -> {
             if (isOwner) {
-                // Eğer benimse iptal etme süreci
+                
                 handleCancelProcess(act, row);
             } else {
                 // Başkasınınsa sadece ayrılma süreci
@@ -141,12 +141,12 @@ public class MainController {
         activityContainer.getChildren().add(row);
     }
 
-    // --- AKSİYON METOTLARI (BACKEND'E BAĞLI) ---
+    
     private void handleCancelProcess(Activity act, HBox row) {
         LocalDateTime startTime = LocalDateTime.of(act.getDate(), act.getTime());
         long hoursLeft = Duration.between(LocalDateTime.now(), startTime).toHours();
 
-        // 3 Saat Kontrolü
+        
         if (hoursLeft < 3 && hoursLeft >= 0) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText("Time Conflict!");
@@ -164,14 +164,14 @@ public class MainController {
         if (confirmAction("Leave the activity", act.getActivityName() + " aktivitesinden ayrılmak istediğine emin misin?")) {
             User me = SessionManager.getCurrentUser();
 
-            // Backend'den silme işlemleri
+            
             act.removeParticipant(me);
 
             List<Activity> attended = me.getAttendedActivities();
             attended.remove(act);
             me.setAttendedActivities(attended);
 
-            // Frontend: Ekrandan sil
+            
             activityContainer.getChildren().remove(row);
         }
     }
@@ -184,7 +184,7 @@ public class MainController {
         return alert.showAndWait().filter(r -> r == ButtonType.OK).isPresent();
     }
 
-    // --- SAYFA YÖNLENDİRME METODLARI ---
+    
     @FXML public void goToProfile(ActionEvent event) throws IOException { switchScene(event, "profilePage.fxml"); }
     @FXML public void goToFriends(ActionEvent event) throws IOException { switchScene(event, "friendsPage.fxml"); }
     @FXML public void goToHome(ActionEvent event) throws IOException { /* Zaten Home sayfasındayız */ }
