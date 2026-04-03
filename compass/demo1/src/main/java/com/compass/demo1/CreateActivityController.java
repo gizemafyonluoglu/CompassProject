@@ -98,7 +98,7 @@ public class CreateActivityController {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Aktivite başarıyla oluşturuldu!", ButtonType.OK);
             alert.showAndWait();
 
-            goToActivity(event);
+            goToHome(event);
 
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Lütfen tüm alanları doğru doldurun (Saat: 14:00 gibi).", ButtonType.OK);
