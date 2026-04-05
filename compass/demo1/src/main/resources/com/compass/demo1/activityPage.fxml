@@ -102,17 +102,17 @@
                 <HBox spacing="20.0">
                     <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                         <Label style="-fx-font-weight: bold;" text="Date" />
-                        <DatePicker maxWidth="Infinity" promptText="Select Date" styleClass="profile-field-box" />
+                        <DatePicker fx:id="filterDatePicker" maxWidth="Infinity" promptText="Select Date" styleClass="profile-field-box" />
                     </VBox>
                     <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                         <Label style="-fx-font-weight: bold;" text="Time" />
-                        <TextField promptText="18 : 00" styleClass="profile-field-box" />
+                        <TextField fx:id="filterTimeField" promptText="18:00" styleClass="profile-field-box" />
                     </VBox>
                 </HBox>
 
                 <VBox spacing="10.0">
                     <Label style="-fx-font-weight: bold;" text="Interests" />
-                    <FlowPane hgap="10.0" vgap="10.0">
+                    <FlowPane fx:id="interestsFlowPane" hgap="10.0" vgap="10.0">
                         <ToggleButton styleClass="interest-toggle" text="Music" />
                         <ToggleButton styleClass="interest-toggle" text="Movies" />
                         <ToggleButton styleClass="interest-toggle" text="Travel" />

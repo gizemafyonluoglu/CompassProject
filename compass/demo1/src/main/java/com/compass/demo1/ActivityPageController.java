@@ -13,6 +13,8 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -25,6 +27,9 @@ public class ActivityPageController {
     @FXML private Pane overlay;
     @FXML private VBox filterPopup;
     @FXML private VBox conflictPopup;
+    @FXML private DatePicker filterDatePicker;
+    @FXML private TextField filterTimeField;
+    @FXML private FlowPane interestsFlowPane;
 
     private Activity pendingActivity = null;
 
@@ -198,7 +203,72 @@ public class ActivityPageController {
     }
 
     @FXML public void showFilterPopup() { hideAllPopups(); overlay.setVisible(true); filterPopup.setVisible(true); }
-    @FXML public void applyFilters() { hideAllPopups(); }
+    @FXML
+    public void applyFilters() {
+        // 1. Ekrandaki Tarih ve Saat verilerini al
+        LocalDate selectedDate = filterDatePicker.getValue();
+
+        LocalTime selectedTime = null;
+        String timeText = filterTimeField.getText();
+        if (timeText != null && !timeText.trim().isEmpty()) {
+            try {
+                // Kullanıcının girdiği "18:00" metnini Java'nın LocalTime objesine çevir
+                selectedTime = LocalTime.parse(timeText.trim());
+            } catch (Exception e) {
+                System.out.println("Saat formatı hatalı, filtreye dahil edilmedi.");
+            }
+        }
+
+        // FXML popup'ında Location ve ActivityType için ayrı bir giriş kutumuz yoktu.
+        // Location zaten ana ekrandaki Search Bar'dan aranabiliyor. O yüzden bunları null geçiyoruz.
+        String locationFilter = null;
+        String typeFilter = null;
+
+        // 2. SENİN ActivityFilter SINIFINI ÇALIŞTIR
+        ActivityFilter myFilter = new ActivityFilter(selectedDate, selectedTime, locationFilter, typeFilter);
+
+        // Bütün aktiviteleri senin yazdığın metoda gönderip filtrelenmiş listeyi alıyoruz
+        List<Activity> filteredList = myFilter.applyFilter(allActivities);
+
+
+        // 3. İLGİ ALANLARI (INTERESTS) İÇİN EK FİLTRELEME
+        // (ActivityFilter sınıfında kategori listesi olmadığı için bunu Controller'da hallediyoruz)
+        List<String> selectedInterests = new ArrayList<>();
+        for (Node node : interestsFlowPane.getChildren()) {
+            if (node instanceof ToggleButton) {
+                ToggleButton tb = (ToggleButton) node;
+                if (tb.isSelected()) {
+                    selectedInterests.add(tb.getText()); // Tıklanmış butonların metnini al (Music, Arts vb.)
+                }
+            }
+        }
+
+        // Eğer ekranda en az bir ilgi alanı seçildiyse, senin filtrenden geçenleri bir de buna göre daralt
+        if (!selectedInterests.isEmpty()) {
+            List<Activity> interestFilteredList = new ArrayList<>();
+            for (Activity act : filteredList) {
+                // Eğer aktivitenin kategorisi, seçilen butonlardan biriyle eşleşiyorsa ekle
+                if (selectedInterests.contains(act.getCategory())) {
+                    interestFilteredList.add(act);
+                }
+            }
+            filteredList = interestFilteredList; // Son listeyi güncelle
+        }
+
+        // 4. FİLTRELENMİŞ LİSTEYİ EKRANA BAS
+        activitiesListContainer.getChildren().clear();
+        for (Activity act : filteredList) {
+            // Dolu veya iptal edilmiş aktiviteleri gösterme
+            if (act.isFull() || act.isCancelled()) continue;
+
+            HBox row = createActivityRow(act);
+            activitiesListContainer.getChildren().add(row);
+        }
+
+        // 5. İşlem bitince Pop-up'ı kapat
+        hideAllPopups();
+    }
+
     @FXML public void hideAllPopups() {
         if (overlay != null) overlay.setVisible(false);
         if (filterPopup != null) filterPopup.setVisible(false);
