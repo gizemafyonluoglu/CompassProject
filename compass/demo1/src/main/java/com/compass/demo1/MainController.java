@@ -29,7 +29,7 @@ public class MainController {
 
     @FXML
     public void initialize() {
-        // Sayfa açıldığında giriş yapan kullanıcının aktivitelerini yükler
+
         loadUserActivities();
     }
 
@@ -39,17 +39,11 @@ public class MainController {
 
         if (me == null) return;
 
-        // BÜTÜN TEST VERİSİ ÜRETME KODLARI SİLİNDİ!
-        // Veriler artık tamamen SessionManager üzerinden Database'den çekiliyor.
-
-        // 1. Kendi kurduğum aktiviteleri çiz (isOwner = true)
         for (Activity act : me.getCreatedActivities()) {
             if (!act.isCancelled()) {
                 addActivityRow(act, true);
             }
         }
-
-        // 2. Katıldığım aktiviteleri çiz (isOwner = false)
         for (Activity act : me.getAttendedActivities()) {
             if (!act.isCancelled()) {
                 addActivityRow(act, false);
@@ -62,8 +56,6 @@ public class MainController {
         row.setAlignment(Pos.CENTER_LEFT);
         row.getStyleClass().add("card-row");
         row.setPadding(new Insets(10, 20, 10, 20));
-
-        // 1. Profil Fotosu (Daire şeklinde)
         StackPane profileBox = new StackPane();
         profileBox.setPrefSize(40, 40);
         ImageView profileView = new ImageView();
@@ -76,11 +68,7 @@ public class MainController {
         profileView.setFitHeight(40);
         profileView.setFitWidth(40);
         profileView.setClip(new Circle(20, 20, 20));
-
-        // Fotoğrafı StackPane içine ekle
         profileBox.getChildren().add(profileView);
-
-        // KULÜP AKTİVİTESİ KONTROLÜ (Senin OOP yapın devrede)
         if (act instanceof ClubActivity) {
             Label badge = new Label("✔");
             badge.setStyle("-fx-background-color: white; -fx-text-fill: #16A34A; -fx-font-size: 10px; " +
@@ -91,13 +79,9 @@ public class MainController {
             badge.setTranslateY(5);
             profileBox.getChildren().add(badge);
         }
-
-        // 2. Aktivite Adı
         Label lblName = new Label(act.getActivityName());
         lblName.setPrefWidth(160);
         lblName.setStyle("-fx-font-weight: bold; -fx-font-size: 14;");
-
-        // 3. Bilgi Kutucukları (Badge'ler)
         Label lblPlace = new Label(act.getPlace());
         lblPlace.getStyleClass().add("badge-blue");
         lblPlace.setPrefWidth(180);
@@ -105,34 +89,26 @@ public class MainController {
         Label lblDate = new Label(act.getDate().toString());
         lblDate.getStyleClass().add("badge-orange");
         lblDate.setPrefWidth(100);
-
-        
         String timeStr = act.getTime().toString() + " - " + act.getTime().plusMinutes(90).toString();
         Label lblTime = new Label(timeStr);
         lblTime.getStyleClass().add("badge-green");
         lblTime.setPrefWidth(110);
-
-        // 4. Kota (Mor Yazı)
         Label lblQuota = new Label(act.getJoinedUsers().size() + "/" + act.getQuota());
         lblQuota.setStyle("-fx-text-fill: #8A2BE2; -fx-font-weight: bold;");
         lblQuota.setPrefWidth(50);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        // 5. Aksiyon Butonu (isOwner ise turuncu X, değilse kırmızı —)
         Button actionBtn = new Button(isOwner ? "X" : "—");
         String btnColor = isOwner ? "#EF4444" : "#F97316";
         actionBtn.setStyle("-fx-background-color: " + btnColor + "; -fx-text-fill: white; " +
                 "-fx-background-radius: 50; -fx-min-width: 32; -fx-min-height: 32; -fx-cursor: hand;");
-
-        // 6. Buton Tıklama Mantığı
         actionBtn.setOnAction(e -> {
             if (isOwner) {
-                
+
                 handleCancelProcess(act, row);
             } else {
-                // Başkasınınsa sadece ayrılma süreci
+
                 handleLeaveProcess(act, row);
             }
         });
@@ -140,13 +116,10 @@ public class MainController {
         row.getChildren().addAll(profileBox, lblName, lblPlace, lblDate, lblTime, lblQuota, spacer, actionBtn);
         activityContainer.getChildren().add(row);
     }
-
-    
     private void handleCancelProcess(Activity act, HBox row) {
         LocalDateTime startTime = LocalDateTime.of(act.getDate(), act.getTime());
         long hoursLeft = Duration.between(LocalDateTime.now(), startTime).toHours();
 
-        
         if (hoursLeft < 3 && hoursLeft >= 0) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText("Time Conflict!");
@@ -154,8 +127,19 @@ public class MainController {
             alert.showAndWait();
         } else {
             if (confirmAction("Cancel activity", "Are you sure you want to delete this activity?")) {
-                act.cancelActivity(); // Backend: Aktiviteyi iptal statüsüne al
-                activityContainer.getChildren().remove(row); // Frontend: Ekrandan sil
+                Database db = Database.getInstance();
+                User me = SessionManager.getCurrentUser();
+
+                act.cancelActivity();
+                db.saveActivity(act);
+
+                List<Activity> created = me.getCreatedActivities();
+                created.remove(act);
+                me.setCreatedActivities(created);
+                me.getCalendar().removeActivity(act);
+                db.saveUser(me);
+
+                activityContainer.getChildren().remove(row);
             }
         }
     }
@@ -163,15 +147,18 @@ public class MainController {
     private void handleLeaveProcess(Activity act, HBox row) {
         if (confirmAction("Leave the activity", act.getActivityName() + " aktivitesinden ayrılmak istediğine emin misin?")) {
             User me = SessionManager.getCurrentUser();
+            Database db = Database.getInstance();
 
-            
             act.removeParticipant(me);
+            db.saveActivity(act);
+
+            me.getCalendar().removeActivity(act);
 
             List<Activity> attended = me.getAttendedActivities();
             attended.remove(act);
             me.setAttendedActivities(attended);
+            db.saveUser(me);
 
-            
             activityContainer.getChildren().remove(row);
         }
     }
@@ -183,8 +170,6 @@ public class MainController {
         alert.setContentText(content);
         return alert.showAndWait().filter(r -> r == ButtonType.OK).isPresent();
     }
-
-    
     @FXML public void goToProfile(ActionEvent event) throws IOException { switchScene(event, "profilePage.fxml"); }
     @FXML public void goToFriends(ActionEvent event) throws IOException { switchScene(event, "friendsPage.fxml"); }
     @FXML public void goToHome(ActionEvent event) throws IOException { /* Zaten Home sayfasındayız */ }

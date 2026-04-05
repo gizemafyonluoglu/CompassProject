@@ -289,9 +289,12 @@ public class Database {
             blockedIds.add(b.getUserId());
         }
 
-        List<String> interestIds = new ArrayList<>();
+        List<Document> interestDocs = new ArrayList<>();
         for (Interest i : user.getInterests()) {
-            interestIds.add(i.getInterestId());
+            Document idoc = new Document();
+            idoc.append("interestId", i.getInterestId());
+            idoc.append("interestName", i.getInterestName());
+            interestDocs.add(idoc);
         }
 
         List<String> createdIds = new ArrayList<>();
@@ -321,7 +324,7 @@ public class Database {
         doc.append("availabilityVisible", user.isAvailabilityVisible());
         doc.append("friendIds", friendIds);
         doc.append("blockedIds", blockedIds);
-        doc.append("interestIds", interestIds);
+        doc.append("interests", interestDocs);
         doc.append("createdActivityIds", createdIds);
         doc.append("attendedActivityIds", attendedIds);
         doc.append("calendarId", calendarId);
@@ -356,18 +359,22 @@ public class Database {
         if ("Admin".equals(userType)) {
             user = new Admin(userId, name, surname, email, password);
 
-        } else if ("ClubBoardMember".equals(userType)) {
-            String clubName = doc.getString("clubName");
-            ClubBoardMember cbm = new ClubBoardMember(userId, name, surname, email, password, clubName);
-            Boolean approved = doc.getBoolean("boardStatusApproved");
-            if (approved != null && approved) {
-                cbm.setBoardStatusApproved(true);
-            } else {
-                cbm.setBoardStatusApproved(false);
-            }
-            user = cbm;
+        } 
+        //else if(doc.getBoolean("boardStatusApproved")){
+            else if ("ClubBoardMember".equals(userType)) {
+                String clubName = doc.getString("clubName");
+                ClubBoardMember cbm = new ClubBoardMember(userId, name, surname, email, password, clubName);
+                Boolean approved = doc.getBoolean("boardStatusApproved");
+                if (approved != null && approved) {
+                    cbm.setBoardStatusApproved(true);
+                } else {
+                    cbm.setBoardStatusApproved(false);
+                }
+                user = cbm;
 
-        } else {
+            //} 
+        }
+        else {
             user = new User(userId, name, surname, email, password);
         }
 
@@ -394,19 +401,49 @@ public class Database {
             user.setProfilePhotoBase64(photoBase64);
         }
 
-        List<String> interestIds = doc.getList("interestIds", String.class);
-        if (interestIds != null) {
-            List<Interest> allInterests = getAllInterests();
+        List<Document> interestDocs = doc.getList("interests", Document.class);
+        if (interestDocs != null) {
             List<Interest> userInterests = new ArrayList<>();
-            for (String iid : interestIds) {
-                for (Interest interest : allInterests) {
-                    if (interest.getInterestId().equals(iid)) {
-                        userInterests.add(interest);
-                        break;
-                    }
+            for (Document idoc : interestDocs) {
+                String iid = idoc.getString("interestId");
+                String iname = idoc.getString("interestName");
+                if (iid != null && iname != null) {
+                    userInterests.add(new Interest(iid, iname));
                 }
             }
             user.updateInterests(userInterests);
+        }
+
+        List<String> friendIds = doc.getList("friendIds", String.class);
+        if (friendIds != null) {
+            for (String fid : friendIds) {
+                Document friendDoc = usersCol.find(eq("userId", fid)).first();
+                if (friendDoc != null) {
+                    String fuid = friendDoc.getString("userId");
+                    String fname = friendDoc.getString("name");
+                    String fsurname = friendDoc.getString("surname");
+                    String femail = friendDoc.getString("email");
+                    String fpass = friendDoc.getString("password");
+                    User friend = new User(fuid, fname, fsurname, femail, fpass);
+                    user.addFriend(friend);
+                }
+            }
+        }
+
+        List<String> blockedIds = doc.getList("blockedIds", String.class);
+        if (blockedIds != null) {
+            for (String bid : blockedIds) {
+                Document blockedDoc = usersCol.find(eq("userId", bid)).first();
+                if (blockedDoc != null) {
+                    String buid = blockedDoc.getString("userId");
+                    String bname = blockedDoc.getString("name");
+                    String bsurname = blockedDoc.getString("surname");
+                    String bemail = blockedDoc.getString("email");
+                    String bpass = blockedDoc.getString("password");
+                    User blocked = new User(buid, bname, bsurname, bemail, bpass);
+                    user.blockUser(blocked);
+                }
+            }
         }
 
         List<String> createdIds = doc.getList("createdActivityIds", String.class);
@@ -706,6 +743,7 @@ public class Database {
         doc.append("clubName", req.getClubName());
         doc.append("status", req.getStatus());
         doc.append("submissionDate", dateStr);
+        doc.append("userId", req.getUserId());
         return doc;
     }
 
@@ -718,14 +756,18 @@ public class Database {
         String documentPath = doc.getString("documentPath");
         String clubName = doc.getString("clubName");
         String status = doc.getString("status");
+        String userId = doc.getString("userId");
 
         LocalDate submissionDate = null;
         if (doc.getString("submissionDate") != null) {
             submissionDate = LocalDate.parse(doc.getString("submissionDate"));
         }
 
-        MembershipRequest req = new MembershipRequest(requestId, documentPath, clubName, submissionDate);
+        MembershipRequest req = new MembershipRequest(requestId, documentPath, clubName, submissionDate, userId);
         req.setStatus(status);
         return req;
     }
+
+    
+   
 }

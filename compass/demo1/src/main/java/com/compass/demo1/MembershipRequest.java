@@ -9,13 +9,15 @@ public class MembershipRequest {
     private String clubName;
     private String status;
     private LocalDate submissionDate;
- 
-    public MembershipRequest(String requestId, String documentPath, String clubName, LocalDate submissionDate) {
+    private String userId;
+
+    public MembershipRequest(String requestId, String documentPath, String clubName, LocalDate submissionDate, String userId) {
         this.requestId = requestId;
         this.documentPath = documentPath;
         this.clubName = clubName;
         this.status = "pending";
         this.submissionDate = submissionDate;
+        this.userId = userId;
     }
 
     public void approve() {
@@ -64,5 +66,13 @@ public class MembershipRequest {
     
     public void setSubmissionDate(LocalDate submissionDate) { 
         this.submissionDate = submissionDate; 
+    }
+
+    public void setUserId(String userId){
+        this.userId = userId;
+    }
+
+    public String getUserId() { 
+        return userId; 
     }
 }

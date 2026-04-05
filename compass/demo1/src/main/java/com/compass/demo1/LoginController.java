@@ -1,3 +1,4 @@
+
 package com.compass.demo1;
 
 import javafx.event.ActionEvent;
@@ -62,7 +63,12 @@ public class LoginController {
 
         if (user != null && user.getPassword().equals(password)) {
             SessionManager.setCurrentUser(user);
-            goToMainPage(event);
+            if(user instanceof Admin){
+                goToAdminPanel(event);
+            }
+            else{
+                goToMainPage(event);
+            }
         } else {
             showErrorMessage(loginErrorLabel, "E-posta veya şifre hatalı!");
         }
@@ -180,6 +186,19 @@ public class LoginController {
     private void goToMainPage(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/compass/demo1/mainPage.fxml"));
+            Parent mainRoot = loader.load();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(mainRoot, 900, 600));
+            stage.centerOnScreen();
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void goToAdminPanel(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/compass/demo1/AdminPanel.fxml"));
             Parent mainRoot = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(mainRoot, 900, 600));

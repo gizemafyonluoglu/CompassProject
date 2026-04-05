@@ -21,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -30,6 +31,7 @@ public class ProfileController {
     @FXML private ImageView profileImageView;
     @FXML private Label defaultUserIcon;
     @FXML private TextField nameTextField;
+    @FXML private Label emailLabel;
 
     @FXML private HBox interestsBox;
     @FXML private FlowPane interestsToggleGroup;
@@ -50,6 +52,7 @@ public class ProfileController {
 
         if (currentUser != null) {
             nameTextField.setText(currentUser.getName() + " " + currentUser.getSurname());
+            emailLabel.setText(currentUser.getEmail());
             String base64 = currentUser.getProfilePhotoBase64();
             if (base64 != null && !base64.isEmpty()) {
                 byte[] imageBytes = Base64.getDecoder().decode(base64);
@@ -168,14 +171,41 @@ public class ProfileController {
     }
 
     @FXML
-    public void submitBoardMembership() {
-        if (!fileNameLabel.getText().equals("Upload a file...")) {
-            System.out.println("Dosya onaya gitti: " + fileNameLabel.getText());
-            hideAllPopups();
-            fileNameLabel.setText("Upload a file...");
-            fileNameLabel.setStyle("-fx-text-fill: #9CA3AF;");
-        }
+public void submitBoardMembership() {
+    String filePath = fileNameLabel.getText();
+    
+    // Eğer gerçekten bir dosya seçilmişse işlemi yap
+    if (!filePath.equals("Upload a file...")) {
+        
+        // 1. O anki kullanıcıyı al
+        User me = SessionManager.getCurrentUser();
+        
+        // 2. Gerekli verileri hazırla
+        String newRequestId = "REQ-" + System.currentTimeMillis();
+        String targetClub = "Bilkent Computer Club"; // Bu kısmı istersen arayüzden (ComboBox vb.) alabilirsin
+        LocalDate submissionDate = LocalDate.now();
+        
+        // 3. SENİN SINIFINLA objeyi yarat (4 Parametreli Constructor)
+        MembershipRequest request = new MembershipRequest(newRequestId, filePath, targetClub, submissionDate, me.getUserId());
+        
+        // 4. Veritabanı için hayati olan Kullanıcı ID'sini setter ile ekle
+        request.setUserId(me.getUserId());
+
+        // 5. Veritabanına Mapper metodun üzerinden kaydet
+        Database db = Database.getInstance();
+        db.saveMembershipRequest(request);
+
+        System.out.println("Başarılı! Dosya onaya gitti: " + filePath);
+        
+        // 6. Arayüzü temizle ve pop-up'ı kapat
+        hideAllPopups(); // Senin pop-up kapatma metodun
+        fileNameLabel.setText("Upload a file...");
+        fileNameLabel.setStyle("-fx-text-fill: #9CA3AF;");
+        
+    } else {
+        System.out.println("Lütfen önce bir dosya seçin!");
     }
+}
 
     @FXML
     public void showBoardMembershipPopup() { hideAllPopups(); overlay.setVisible(true); boardMembershipPopup.setVisible(true); }
