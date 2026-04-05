@@ -91,6 +91,11 @@ public class CreateActivityController {
             List<Activity> created = me.getCreatedActivities();
             created.add(newActivity);
             me.setCreatedActivities(created);
+
+            if (me.getCalendar() != null) {
+                me.getCalendar().addActivity(newActivity);
+            }
+
             db.saveUser(me);
             // MongoDB'de kullanıcının createdActivityIds listesi güncellenir
 

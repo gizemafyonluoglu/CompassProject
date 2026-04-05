@@ -343,6 +343,19 @@ public class Database {
         return doc;
     }
 
+    public void approveClubBoardMember(String userId, String clubName) {
+    MongoCollection<Document> usersCollection = database.getCollection("users");
+    
+    usersCollection.updateOne(
+        Filters.eq("userId", userId),
+        Updates.combine(
+            Updates.set("userType", "ClubBoardMember"),
+            Updates.set("boardStatusApproved", true),
+            Updates.set("clubName", clubName) // KULLANICININ KULÜP ADINI BURADA EKLİYORSUN
+        )
+    );
+}
+
     private User documentToUser(Document doc) {
         if (doc == null) {
             return null;

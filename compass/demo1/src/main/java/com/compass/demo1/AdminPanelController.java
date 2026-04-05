@@ -107,12 +107,12 @@ public class AdminPanelController {
         Button approveBtn = new Button("✓ Approve");
         approveBtn.setPrefWidth(150);
         approveBtn.setStyle("-fx-background-color: #10B981; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10; -fx-cursor: hand;");
-        approveBtn.setOnAction(e -> handleAction(req.getRequestId(), "approved"));
+        approveBtn.setOnAction(e -> handleAction(req, "approved"));
 
         Button rejectBtn = new Button("✕ Reject");
         rejectBtn.setPrefWidth(150);
         rejectBtn.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10; -fx-cursor: hand;");
-        rejectBtn.setOnAction(e -> handleAction(req.getRequestId(), "rejected"));
+        rejectBtn.setOnAction(e -> handleAction(req, "rejected"));
 
         btnArea.getChildren().addAll(approveBtn, rejectBtn);
 
@@ -122,10 +122,21 @@ public class AdminPanelController {
     }
 
 
-    private void handleAction(String requestId, String status) {
-        db.updateRequestStatus(requestId, status);
-        loadPendingRequests();
+   private void handleAction(MembershipRequest req, String status) {
+    // 1. Başvuru formunun durumunu güncelle (Request koleksiyonu)
+    db.updateRequestStatus(req.getRequestId(), status);
+
+    // 2. Eğer onaylandıysa kullanıcıyı asıl veritabanında (Users koleksiyonu) güncelle
+    if ("approved".equals(status)) {
+        db.approveClubBoardMember(req.getUserId(), req.getClubName());
+        System.out.println("Başarılı: " + req.getUserId() + " ID'li kullanıcı " + req.getClubName() + " yöneticisi yapıldı.");
+    } else {
+        System.out.println("Talep reddedildi: " + req.getRequestId());
     }
+
+    // 3. Ekrandaki bekleyenler listesini yenile
+    loadPendingRequests();
+}
 
 
     @FXML public void goToProfile(ActionEvent event) throws IOException { switchScene(event, "profilePage.fxml"); }
