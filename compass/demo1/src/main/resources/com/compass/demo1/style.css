@@ -403,3 +403,38 @@
 .toggle-container:disabled {
     -fx-opacity: 0.4;
 }
+
+/* --- iOS Style Switch CheckBox (DÜZELTİLMİŞ) --- */
+.ios-switch .box {
+    -fx-background-color: #D1D5DB; /* Kapalıyken gri */
+    -fx-background-radius: 20px;
+    -fx-min-width: 45px;
+    -fx-max-width: 45px;
+    -fx-min-height: 25px;
+    -fx-max-height: 25px;
+}
+
+.ios-switch:selected .box {
+    -fx-background-color: #8A2BE2; /* Açıkken mor */
+}
+
+.ios-switch .mark {
+    -fx-background-color: white;
+    -fx-background-radius: 20px;
+    -fx-min-width: 21px;
+    -fx-max-width: 21px;
+    -fx-min-height: 21px;
+    -fx-max-height: 21px;
+
+    /* Sündürmeyi engeller, kusursuz yuvarlak şekil verir */
+    -fx-shape: "M10,0 a10,10 0 1,0 0,20 a10,10 0 1,0 0,-20";
+
+    -fx-translate-x: -9px; /* Kapalıyken solda durur */
+
+    /* Topun altına çok hafif şık bir gölge (3D efekti) */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);
+}
+
+.ios-switch:selected .mark {
+    -fx-translate-x: 9px; /* Açıkken sağa kayar */
+}

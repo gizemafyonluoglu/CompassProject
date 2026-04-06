@@ -13,6 +13,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.control.CheckBox?>
 <StackPane xmlns="http://javafx.com/javafx/25"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.compass.demo1.CreateActivityController"
@@ -40,24 +43,23 @@
                         <!-- Visibility -->
                         <VBox spacing="8.0">
                             <children>
-                                <Label text="Visibility" style="-fx-font-weight: bold;"/>
-                                <HBox spacing="12.0">
+                                <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-background-color: #F8F9FA; -fx-padding: 10 20; -fx-background-radius: 12;">
                                     <children>
-                                        <ToggleButton fx:id="togglePublic" text="Public" selected="true" styleClass="button-secondary"/>
-                                        <ToggleButton fx:id="toggleFriends" text="Friends Only" styleClass="button-secondary"/>
+                                        <Label text="Public" style="-fx-font-weight: bold; -fx-text-fill: #1E293B;"/>
+                                        <CheckBox fx:id="switchVisibility" styleClass="ios-switch" />
+                                        <Label text="Friends Only" style="-fx-font-weight: bold; -fx-text-fill: #1E293B;"/>
                                     </children>
                                 </HBox>
                             </children>
                         </VBox>
 
-                        <!-- Type -->
                         <VBox spacing="8.0">
                             <children>
-                                <Label text="Type" style="-fx-font-weight: bold;"/>
-                                <HBox spacing="12.0">
+                                <HBox fx:id="typeToggleContainer" alignment="CENTER_LEFT" spacing="15.0" style="-fx-background-color: #F8F9FA; -fx-padding: 10 20; -fx-background-radius: 12;">
                                     <children>
-                                        <ToggleButton fx:id="toggleRegular" text="Regular" selected="true" styleClass="button-secondary"/>
-                                        <ToggleButton fx:id="toggleClub" text="Club" styleClass="button-secondary"/>
+                                        <Label text="Regular Activity" style="-fx-font-weight: bold; -fx-text-fill: #1E293B;"/>
+                                        <CheckBox fx:id="switchType" styleClass="ios-switch" />
+                                        <Label text="Club Activity" style="-fx-font-weight: bold; -fx-text-fill: #8A2BE2;"/>
                                     </children>
                                 </HBox>
                             </children>
@@ -66,7 +68,7 @@
                         <VBox spacing="6.0">
                             <children>
                                 <Label text="Category" style="-fx-font-weight: bold;"/>
-                                <TextField fx:id="inpCategory" promptText="e.g. Sports, Music, Study" styleClass="text-field"/>
+                                <TextField fx:id="inpCategory" editable="false" onMouseClicked="#showCategoryPopup" promptText="Select categories..." styleClass="text-field" style="-fx-cursor: hand;" />
                             </children>
                         </VBox>
 
@@ -128,6 +130,40 @@
                     </children>
                 </VBox>
 
+            </children>
+        </VBox>
+        <Pane fx:id="overlay" onMouseClicked="#hideCategoryPopup" style="-fx-background-color: rgba(0,0,0,0.5);" visible="false" />
+
+        <VBox fx:id="categoryPopup" maxWidth="550.0" spacing="20.0" styleClass="card" visible="false" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 5);">
+            <padding><Insets bottom="30.0" left="30.0" right="30.0" top="30.0" /></padding>
+            <children>
+                <Label style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #1E293B;" text="Select Categories" />
+                <Label style="-fx-text-fill: #6B7280;" text="Choose the categories for the activity you will create." />
+
+                <FlowPane hgap="12.0" vgap="12.0">
+                    <children>
+                        <Button onAction="#toggleCategory" styleClass="interest-button" text="Music" prefWidth="140" />
+                        <Button onAction="#toggleCategory" styleClass="interest-button" text="Arts" prefWidth="140" />
+                        <Button onAction="#toggleCategory" styleClass="interest-button" text="Gaming" prefWidth="140" />
+                        <Button onAction="#toggleCategory" styleClass="interest-button" text="Movies" prefWidth="140" />
+                        <Button onAction="#toggleCategory" styleClass="interest-button" text="Writing" prefWidth="140" />
+                        <Button onAction="#toggleCategory" styleClass="interest-button" text="Food &amp; Cooking" prefWidth="140" />
+                        <Button onAction="#toggleCategory" styleClass="interest-button" text="Travel" prefWidth="140" />
+                        <Button onAction="#toggleCategory" styleClass="interest-button" text="Engineering" prefWidth="140" />
+                        <Button onAction="#toggleCategory" styleClass="interest-button" text="Philosophy" prefWidth="140" />
+                        <Button onAction="#toggleCategory" styleClass="interest-button" text="Psychology" prefWidth="140" />
+                        <Button onAction="#toggleCategory" styleClass="interest-button" text="Economics" prefWidth="140" />
+                        <Button onAction="#toggleCategory" styleClass="interest-button" text="Mathematics" prefWidth="140" />
+                    </children>
+                </FlowPane>
+
+                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                    <children>
+                        <Button onAction="#hideCategoryPopup" style="-fx-background-color: white; -fx-border-color: #CBD5E1; -fx-border-radius: 10; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-padding: 8 20; -fx-cursor: hand;" text="Cancel" />
+                        <Button onAction="#confirmCategories" style="-fx-background-color: #8A2BE2; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 25; -fx-cursor: hand;" text="OK" />
+                    </children>
+                    <VBox.margin><Insets top="10.0" /></VBox.margin>
+                </HBox>
             </children>
         </VBox>
     </children>

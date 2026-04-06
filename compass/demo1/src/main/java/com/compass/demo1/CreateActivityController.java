@@ -7,6 +7,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -18,8 +21,9 @@ import java.util.UUID;
 public class CreateActivityController {
 
     // --- FXML BİLEŞENLERİ (Tasarımdaki sırayla) ---
-    @FXML private ToggleButton togglePublic, toggleFriends;
-    @FXML private ToggleButton toggleClub, toggleRegular;
+    @FXML private CheckBox switchVisibility;
+    @FXML private CheckBox switchType;
+    @FXML private HBox typeToggleContainer;
 
     @FXML private TextField inpCategory;
     @FXML private TextField inpName;
@@ -29,14 +33,29 @@ public class CreateActivityController {
     @FXML private TextField inpTime; // Örn: "14:00"
     @FXML private TextField inpQuota;
 
+    @FXML private Pane overlay;
+    @FXML private VBox categoryPopup;
+    private List<String> selectedCategories = new java.util.ArrayList<>();
+
     @FXML
     public void initialize() {
         User me = SessionManager.getCurrentUser();
 
         // Kulüp Yöneticisi Kontrolü (Sadece onaylı kulüp üyeleri kulüp aktivitesi açabilir)
-        if (!(me instanceof ClubBoardMember && ((ClubBoardMember) me).isBoardStatusApproved())) {
-            if (toggleClub != null) {
-                toggleClub.setDisable(true);
+        if (switchType != null) {
+            switchType.setDisable(true);
+        }
+        if (typeToggleContainer != null) {
+            typeToggleContainer.setOpacity(0.5);
+        }
+
+        // 2. Eğer kullanıcı ONAYLI BİR KULÜP YÖNETİCİSİ ise kilidi aç!
+        if (me instanceof ClubBoardMember && ((ClubBoardMember) me).isBoardStatusApproved()) {
+            if (switchType != null) {
+                switchType.setDisable(false);
+            }
+            if (typeToggleContainer != null) {
+                typeToggleContainer.setOpacity(1.0); // Rengi normale döndür
             }
         }
     }
@@ -56,7 +75,7 @@ public class CreateActivityController {
             LocalTime time = LocalTime.parse(rawTime);
 
             int quota = Integer.parseInt(inpQuota.getText());
-            String visibility = (toggleFriends != null && toggleFriends.isSelected()) ? "Friends Only" : "Public";
+            String visibility = (switchVisibility != null && switchVisibility.isSelected()) ? "Friends Only" : "Public";
 
             // MongoDB için benzersiz ID oluştur
             String activityId = "ACT-" + UUID.randomUUID().toString().substring(0, 8);
@@ -65,7 +84,7 @@ public class CreateActivityController {
             Activity newActivity;
 
             // 2. OOP POLİMORFİZMİ: Kulüp mü yoksa Normal mi?
-            if (toggleClub != null && toggleClub.isSelected() && me instanceof ClubBoardMember) {
+            if (switchType != null && switchType.isSelected() && me instanceof ClubBoardMember) {
                 ClubBoardMember boardMember = (ClubBoardMember) me;
                 newActivity = new ClubActivity(
                         activityId, name, desc, category, place, date, time, quota,
@@ -110,6 +129,42 @@ public class CreateActivityController {
             alert.showAndWait();
             e.printStackTrace();
         }
+    }
+
+    // Pop-up'ı açar
+    @FXML
+    public void showCategoryPopup() {
+        if (overlay != null) overlay.setVisible(true);
+        if (categoryPopup != null) categoryPopup.setVisible(true);
+    }
+
+    // Pop-up'ı kapatır
+    @FXML
+    public void hideCategoryPopup() {
+        if (overlay != null) overlay.setVisible(false);
+        if (categoryPopup != null) categoryPopup.setVisible(false);
+    }
+
+    // Butonlara tıklandığında seçimi ayarlar ve rengini değiştirir
+    @FXML
+    public void toggleCategory(ActionEvent event) {
+        Node node = (Node) event.getSource();
+        Button btn = (Button) node;
+
+        if (node.getStyleClass().contains("selected")) {
+            node.getStyleClass().remove("selected");
+            selectedCategories.remove(btn.getText());
+        } else {
+            node.getStyleClass().add("selected");
+            selectedCategories.add(btn.getText());
+        }
+    }
+
+    // "OK" tuşuna basıldığında seçilenleri TextField'a yazar
+    @FXML
+    public void confirmCategories() {
+        inpCategory.setText(String.join(", ", selectedCategories));
+        hideCategoryPopup();
     }
 
     @FXML
