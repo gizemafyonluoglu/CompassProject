@@ -81,18 +81,18 @@ public class MainController {
         }
         Label lblName = new Label(act.getActivityName());
         lblName.setPrefWidth(160);
-        lblName.setStyle("-fx-font-weight: bold; -fx-font-size: 14;");
+        lblName.setStyle("-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: black;");
         Label lblPlace = new Label(act.getPlace());
         lblPlace.getStyleClass().add("badge-blue");
-        lblPlace.setPrefWidth(180);
+        lblPlace.setPrefWidth(120);
 
         Label lblDate = new Label(act.getDate().toString());
         lblDate.getStyleClass().add("badge-orange");
-        lblDate.setPrefWidth(100);
+        lblDate.setPrefWidth(130);
         String timeStr = act.getTime().toString() + " - " + act.getTime().plusMinutes(90).toString();
         Label lblTime = new Label(timeStr);
         lblTime.getStyleClass().add("badge-green");
-        lblTime.setPrefWidth(110);
+        lblTime.setPrefWidth(140);
         Label lblQuota = new Label(act.getJoinedUsers().size() + "/" + act.getQuota());
         lblQuota.setStyle("-fx-text-fill: #8A2BE2; -fx-font-weight: bold;");
         lblQuota.setPrefWidth(50);
@@ -114,6 +114,16 @@ public class MainController {
         });
 
         row.getChildren().addAll(profileBox, lblName, lblPlace, lblDate, lblTime, lblQuota, spacer, actionBtn);
+
+        //ACTİVİTY DETAİL
+        // addActivityRow metodunun sonuna ekle:
+        row.setCursor(javafx.scene.Cursor.HAND); // Mouse üzerine gelince el işareti çıksın
+        row.setOnMouseClicked(event -> {
+            // Eğer butona basılmadıysa (sadece satıra basıldıysa) aç
+            if (!(event.getTarget() instanceof Button)) {
+                openActivityPopUp(act);
+            }
+        });
         activityContainer.getChildren().add(row);
     }
     private void handleCancelProcess(Activity act, HBox row) {
@@ -183,5 +193,32 @@ public class MainController {
         Scene scene = new Scene(root, 900, 600);
         stage.setScene(scene);
         stage.show();
+    }
+
+    private void openActivityPopUp(Activity act) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ActivityDetail.fxml"));
+            Parent root = loader.load();
+
+            ActivityDetailController controller = loader.getController();
+            // Buraya dikkat: Activity class'ında getCreatorName gibi metodların olduğunu varsayıyorum
+            // Eğer yoksa act.getOwnerId() üzerinden User çekmen gerekebilir.
+            controller.setActivityData(
+                    act.getActivityName(), // Veya oluşturanın ismi
+                    act.getDescription(),
+                    null // Şimdilik default icon kullansın diye null
+            );
+
+            Stage popupStage = new Stage();
+            popupStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            popupStage.initStyle(javafx.stage.StageStyle.UNDECORATED); // Görseldeki gibi sade çerçeve
+
+            Scene scene = new Scene(root);
+            popupStage.setScene(scene);
+            popupStage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

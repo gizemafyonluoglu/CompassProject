@@ -18,6 +18,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import javafx.scene.Cursor;
+import javafx.scene.control.Button;
 
 public class ActivityPageController {
 
@@ -73,7 +75,7 @@ public class ActivityPageController {
 
         HBox nameBox = new HBox(10);
         nameBox.setAlignment(Pos.CENTER_LEFT);
-        nameBox.setPrefWidth(180);
+        nameBox.setPrefWidth(160);
         Label userIcon = new Label("👤");
         userIcon.setStyle("-fx-font-size: 18; -fx-text-fill: #8A2BE2;");
         Label lblName = new Label(act.getActivityName());
@@ -82,20 +84,20 @@ public class ActivityPageController {
 
         Label lblPlace = new Label(act.getPlace());
         lblPlace.getStyleClass().add("badge-blue");
-        lblPlace.setPrefWidth(200);
+        lblPlace.setPrefWidth(120);
 
         Label lblDate = new Label(act.getDate().toString());
         lblDate.getStyleClass().add("badge-orange");
-        lblDate.setPrefWidth(100);
+        lblDate.setPrefWidth(130);
 
         String timeText = act.getTime().toString() + " - " + act.getTime().plusHours(2).toString();
         Label lblTime = new Label(timeText);
         lblTime.getStyleClass().add("badge-green");
-        lblTime.setPrefWidth(120);
+        lblTime.setPrefWidth(140);
 
         Label lblQuota = new Label(act.getJoinedUsers().size() + "/" + act.getQuota());
         lblQuota.setStyle("-fx-text-fill: #8A2BE2; -fx-font-weight: bold;");
-        lblQuota.setPrefWidth(60);
+        lblQuota.setPrefWidth(50);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -135,6 +137,15 @@ public class ActivityPageController {
         }
 
         row.getChildren().addAll(nameBox, lblPlace, lblDate, lblTime, lblQuota, spacer, actionBtn);
+
+        //ACTİVİTY DETAİL
+        // createActivityRow metodunun sonuna ekle:
+        row.setCursor(javafx.scene.Cursor.HAND);
+        row.setOnMouseClicked(event -> {
+            if (!(event.getTarget() instanceof Button)) {
+                openActivityPopUp(act);
+            }
+        });
         return row;
     }
 
@@ -287,5 +298,32 @@ public class ActivityPageController {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.setScene(new Scene(root, 900, 600));
         stage.show();
+    }
+
+    private void openActivityPopUp(Activity act) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ActivityDetail.fxml"));
+            Parent root = loader.load();
+
+            ActivityDetailController controller = loader.getController();
+            // Buraya dikkat: Activity class'ında getCreatorName gibi metodların olduğunu varsayıyorum
+            // Eğer yoksa act.getOwnerId() üzerinden User çekmen gerekebilir.
+            controller.setActivityData(
+                    act.getActivityName(), // Veya oluşturanın ismi
+                    act.getDescription(),
+                    null // Şimdilik default icon kullansın diye null
+            );
+
+            Stage popupStage = new Stage();
+            popupStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            popupStage.initStyle(javafx.stage.StageStyle.UNDECORATED); // Görseldeki gibi sade çerçeve
+
+            Scene scene = new Scene(root);
+            popupStage.setScene(scene);
+            popupStage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
