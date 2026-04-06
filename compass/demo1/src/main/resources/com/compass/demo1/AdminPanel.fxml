@@ -2,38 +2,29 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<HBox prefHeight="650.0" prefWidth="1000.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.compass.demo1.AdminPanelController">
+<StackPane prefHeight="650.0" prefWidth="1000.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.compass.demo1.AdminPanelController">
     <children>
-        <VBox alignment="TOP_CENTER" prefWidth="80.0" spacing="35.0" style="-fx-background-color: white; -fx-padding: 30 0 0 0; -fx-border-color: #F1F5F9; -fx-border-width: 0 1 0 0;">
-            <children>
-                <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#goToProfile" pickOnBounds="true" preserveRatio="true" styleClass="nav-icon"><image><Image url="@icons/profile.png" /></image></ImageView>
-                <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#goToFriend" pickOnBounds="true" preserveRatio="true" styleClass="nav-icon"><image><Image url="@icons/friend.png" /></image></ImageView>
-                <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#goToHome" pickOnBounds="true" preserveRatio="true" styleClass="nav-icon"><image><Image url="@icons/home.png" /></image></ImageView>
-                <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#goToActivities" pickOnBounds="true" preserveRatio="true" styleClass="nav-icon"><image><Image url="@icons/activity.png" /></image></ImageView>
-                <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#goToCalendar" pickOnBounds="true" preserveRatio="true" styleClass="nav-icon"><image><Image url="@icons/calendar.png" /></image></ImageView>
 
-                <VBox fx:id="adminNav" alignment="CENTER" visible="true">
-                    <VBox.margin><Insets top="10.0" /></VBox.margin>
+        <VBox spacing="20.0" style="-fx-background-color: #F8FAFC; -fx-padding: 40 50 40 50;">
+            <children>
+
+                <HBox alignment="CENTER_LEFT">
                     <children>
-                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" styleClass="nav-icon-active">
-                            <image><Image url="@icons/admin.png" /></image>
-                        </ImageView>
-                    </children>
-                </VBox>
-            </children>
-        </VBox>
+                        <Label style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #8A2BE2;" text="Admin Panel" />
+                        <Region HBox.hgrow="ALWAYS" />
 
-        <VBox HBox.hgrow="ALWAYS" spacing="20.0" style="-fx-background-color: #F8FAFC; -fx-padding: 40 50 40 50;">
-            <children>
-                <Label style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #8A2BE2;" text="Admin Panel" />
+                        <Button onAction="#showSignOutPopup" style="-fx-background-color: #B91C1C; -fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 30; -fx-cursor: hand;" text="Sign Out" />
+                    </children>
+                </HBox>
+
+                <Label style="-fx-text-fill: #64748B; -fx-font-size: 16;" text="Manage board membership requests." />
 
                 <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: #F8FAFC;" VBox.vgrow="ALWAYS">
                     <content>
-                        <TilePane fx:id="requestsContainer" hgap="30.0" prefColumns="2" vgap="30.0">
+                        <TilePane fx:id="requestsContainer" hgap="30.0" prefColumns="3" vgap="30.0">
                             <padding>
                                 <Insets bottom="20.0" left="10.0" right="10.0" top="20.0" />
                             </padding>
@@ -42,5 +33,33 @@
                 </ScrollPane>
             </children>
         </VBox>
+
+        <Pane fx:id="overlay" onMouseClicked="#hideSignOutPopup" style="-fx-background-color: rgba(0,0,0,0.5);" visible="false" />
+
+        <VBox fx:id="signOutPopup" maxWidth="400.0" spacing="20.0" styleClass="card" visible="false" style="-fx-background-color: white; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 5);">
+            <padding><Insets bottom="30.0" left="30.0" right="30.0" top="25.0" /></padding>
+            <children>
+
+                <HBox alignment="CENTER_LEFT">
+                    <children>
+                        <Label style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #B91C1C;" text="Sign Out" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button onAction="#hideSignOutPopup" style="-fx-background-color: transparent; -fx-text-fill: #9CA3AF; -fx-font-size: 18; -fx-cursor: hand;" text="X" />
+                    </children>
+                </HBox>
+
+                <Label style="-fx-font-size: 16; -fx-text-fill: #6B7280;" text="Are you sure you want to sign out?" />
+
+                <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                    <children>
+                        <Button onAction="#hideSignOutPopup" style="-fx-background-color: white; -fx-border-color: #CBD5E1; -fx-border-radius: 12; -fx-background-radius: 12; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-padding: 8 20; -fx-cursor: hand;" text="Cancel" />
+                        <Button onAction="#handleConfirmSignOut" style="-fx-background-color: #B91C1C; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 8 25; -fx-cursor: hand;" text="Sign Out" />
+                    </children>
+                    <VBox.margin><Insets top="10.0" /></VBox.margin>
+                </HBox>
+
+            </children>
+        </VBox>
+
     </children>
-</HBox>
+</StackPane>

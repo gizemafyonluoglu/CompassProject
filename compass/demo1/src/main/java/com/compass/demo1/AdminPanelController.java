@@ -19,30 +19,20 @@ import java.util.List;
 
 public class AdminPanelController {
 
-    // FXML Bağlantıları
-    @FXML private VBox adminNav; // Sidebar'daki admin kısmı
-    @FXML private TilePane requestsContainer; // Kartların dizileceği ızgara
+    @FXML private TilePane requestsContainer;
 
-    // Database
+    // --- Pop-up FXML Bağlantıları ---
+    @FXML private Pane overlay;
+    @FXML private VBox signOutPopup;
+
     private Database db;
 
     @FXML
     public void initialize() {
         db = Database.getInstance();
-        User me = SessionManager.getCurrentUser();
-
-        // 1. Kendi sidebar'ımızda admin ikonunu aktif et
-        if (adminNav != null) {
-            adminNav.setVisible(true);
-            adminNav.setManaged(true);
-            // Şu an admin panelinde olduğumuz için ikona "aktif" stili verebilirsin (CSS ile)
-        }
-
-        // 2. Bekleyen Talepleri Yükle
         loadPendingRequests();
     }
 
-    // MongoDB'den "pending" talepleri çeker
     private void loadPendingRequests() {
         if (requestsContainer == null) return;
         requestsContainer.getChildren().clear();
@@ -57,14 +47,12 @@ public class AdminPanelController {
         }
 
         for (MembershipRequest req : pendingRequests) {
-
             VBox card = createRequestCard(req);
             requestsContainer.getChildren().add(card);
         }
     }
 
     private VBox createRequestCard(MembershipRequest req) {
-
         VBox card = new VBox(15);
         card.setPadding(new Insets(20));
         card.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);");
@@ -72,8 +60,8 @@ public class AdminPanelController {
 
         HBox topBar = new HBox();
         topBar.setAlignment(Pos.CENTER_LEFT);
-        Label nameLbl = new Label("Talebi Atan User ID: " + req.getRequestId());
-        nameLbl.setStyle("-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #1E293B;");
+        Label nameLbl = new Label(req.getRequestId());
+        nameLbl.setStyle("-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #1E293B;");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -83,23 +71,19 @@ public class AdminPanelController {
 
         topBar.getChildren().addAll(nameLbl, spacer, statusLbl);
 
-
         HBox fileArea = new HBox(15);
         fileArea.setAlignment(Pos.CENTER_LEFT);
         fileArea.setStyle("-fx-background-color: #F8FAFC; -fx-background-radius: 10; -fx-padding: 15;");
-
 
         ImageView fileIcon = new ImageView(new Image(getClass().getResourceAsStream("/com/compass/demo1/icons/file.png")));
         fileIcon.setFitWidth(30);
         fileIcon.setFitHeight(30);
         fileIcon.setPreserveRatio(true);
 
-        Label fileLbl = new Label("Board Membership File: " + req.getDocumentPath());
+        Label fileLbl = new Label("User Name " + req.getUserId() + "\nFile: " + req.getDocumentPath());
         fileLbl.setStyle("-fx-font-size: 14; -fx-text-fill: #334155;");
 
         fileArea.getChildren().addAll(fileIcon, fileLbl);
-
-
 
         HBox btnArea = new HBox(15);
         btnArea.setAlignment(Pos.CENTER);
@@ -116,41 +100,50 @@ public class AdminPanelController {
 
         btnArea.getChildren().addAll(approveBtn, rejectBtn);
 
-
         card.getChildren().addAll(topBar, fileArea, btnArea);
         return card;
     }
 
-
-   private void handleAction(MembershipRequest req, String status) {
-    // 1. Başvuru formunun durumunu güncelle (Request koleksiyonu)
-    db.updateRequestStatus(req.getRequestId(), status);
-
-    // 2. Eğer onaylandıysa kullanıcıyı asıl veritabanında (Users koleksiyonu) güncelle
-    if ("approved".equals(status)) {
-        db.approveClubBoardMember(req.getUserId(), req.getClubName());
-        System.out.println("Başarılı: " + req.getUserId() + " ID'li kullanıcı " + req.getClubName() + " yöneticisi yapıldı.");
-    } else {
-        System.out.println("Talep reddedildi: " + req.getRequestId());
+    private void handleAction(MembershipRequest req, String status) {
+        db.updateRequestStatus(req.getRequestId(), status);
+        if ("approved".equals(status)) {
+            db.approveClubBoardMember(req.getUserId(), req.getClubName());
+            System.out.println("Başarılı: " + req.getUserId() + " ID'li kullanıcı " + req.getClubName() + " yöneticisi yapıldı.");
+        } else {
+            System.out.println("Talep reddedildi: " + req.getRequestId());
+        }
+        loadPendingRequests();
     }
 
-    // 3. Ekrandaki bekleyenler listesini yenile
-    loadPendingRequests();
-}
+    // --- Sign Out ve Pop-up Mantığı ---
 
+    @FXML
+    public void showSignOutPopup() {
+        if (overlay != null) overlay.setVisible(true);
+        if (signOutPopup != null) signOutPopup.setVisible(true);
+    }
 
-    @FXML public void goToProfile(ActionEvent event) throws IOException { switchScene(event, "profilePage.fxml"); }
-    @FXML public void goToFriend(ActionEvent event) throws IOException { switchScene(event, "friendsPage.fxml"); }
-    @FXML public void goToHome(ActionEvent event) throws IOException { switchScene(event, "mainPage.fxml"); }
-    @FXML public void goToActivities(ActionEvent event) throws IOException { switchScene(event, "activityPage.fxml"); }
-    @FXML public void goToCalendar(ActionEvent event) throws IOException { switchScene(event, "activityPage.fxml"); }
+    @FXML
+    public void hideSignOutPopup() {
+        if (overlay != null) overlay.setVisible(false);
+        if (signOutPopup != null) signOutPopup.setVisible(false);
+    }
 
+    @FXML
+    public void handleConfirmSignOut(ActionEvent event) {
+        // Oturumu tamamen temizle
+        SessionManager.setCurrentUser(null);
+        System.out.println("Admin çıkış yaptı.");
 
-    private void switchScene(ActionEvent event, String fxmlFile) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
-        Parent root = loader.load();
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(root, 900, 600));
-        stage.show();
+        try {
+            // Çıkış yapınca kişiyi loginPage'e geri gönder
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("loginPage.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root, 1000, 650));
+            stage.centerOnScreen();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
