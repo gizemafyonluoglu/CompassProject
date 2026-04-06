@@ -28,6 +28,9 @@ public class LoginController {
     @FXML private PasswordField signUpPass, signUpPassAgain;
     @FXML private Label signUpErrorLabel;
 
+    @FXML private Label forgotPassErrorLabel;
+    @FXML private Label verifyErrorLabel;
+
     @FXML private PasswordField newPass, confirmPass;
     @FXML private Label errorLabel;
     @FXML private TextField forgotPassEmailField;
@@ -55,7 +58,7 @@ public class LoginController {
         String password = loginPasswordField.getText();
 
         if (email.isEmpty() || password.isEmpty()) {
-            showErrorMessage(loginErrorLabel, "Lütfen tüm alanları doldurun!");
+            showErrorMessage(loginErrorLabel, "Please fill in all the fields!");
             return;
         }
 
@@ -70,7 +73,7 @@ public class LoginController {
                 goToMainPage(event);
             }
         } else {
-            showErrorMessage(loginErrorLabel, "E-posta veya şifre hatalı!");
+            showErrorMessage(loginErrorLabel, "Email or password is incorrect!");
         }
     }
 
@@ -83,13 +86,13 @@ public class LoginController {
         String p2 = signUpPassAgain.getText();
 
         if (name.isEmpty() || surname.isEmpty() || email.isEmpty() || p1.isEmpty() || p2.isEmpty()) {
-            showErrorMessage(signUpErrorLabel, "Lütfen tüm alanları doldurun!");
-        } else if (!email.contains("@")) {
-            showErrorMessage(signUpErrorLabel, "Geçerli bir e-posta girin!");
+            showErrorMessage(signUpErrorLabel, "Please fill in all the fields!");
+        } else if (!email.endsWith("@ug.bilkent.edu.tr")) {
+            showErrorMessage(signUpErrorLabel, "Only accounts with the username @ug.bilkent.edu.tr can register!");
         } else if (!p1.equals(p2)) {
-            showErrorMessage(signUpErrorLabel, "Şifreler uyuşmuyor!");
+            showErrorMessage(signUpErrorLabel, "The passwords do not match!");
         } else if (db.getUser(email) != null) {
-            showErrorMessage(signUpErrorLabel, "Bu e-posta zaten kayıtlı!");
+            showErrorMessage(signUpErrorLabel, "This email is already registered!");
         } else {
             currentVerificationCode = String.valueOf((int) (Math.random() * 900000) + 100000);
             pendingSignUpEmail = email;
@@ -110,7 +113,12 @@ public class LoginController {
         String email = forgotPassEmailField.getText() == null ? "" : forgotPassEmailField.getText().trim();
 
         if (email.isEmpty()) {
-            showErrorMessage(errorLabel, "Lütfen e-posta adresinizi girin.");
+            showErrorMessage(forgotPassErrorLabel, "Please enter your Bilkent e-mail address.");
+            return;
+        }
+
+        if (!email.isEmpty() && !email.endsWith("@ug.bilkent.edu.tr")) {
+            showErrorMessage(forgotPassErrorLabel, "Enter a valid Bilkent email address!");
             return;
         }
 
@@ -128,7 +136,7 @@ public class LoginController {
             overlay.setVisible(true);
             verificationBox.setVisible(true);
         } else {
-            showErrorMessage(errorLabel, "E-posta bulunamadı.");
+            showErrorMessage(forgotPassErrorLabel, "Email not found.");
         }
     }
 
@@ -154,7 +162,7 @@ public class LoginController {
                 showSetPassword();
             }
         } else {
-            showErrorMessage(errorLabel, "Hatalı doğrulama kodu!");
+            showErrorMessage(verifyErrorLabel, "Incorrect verification code!");
         }
     }
 
@@ -165,20 +173,20 @@ public class LoginController {
         String email = pendingForgotPasswordEmail;
 
         if (p1.isEmpty() || p2.isEmpty()) {
-            showErrorMessage(errorLabel, "Şifre alanlarını doldurun!");
+            showErrorMessage(errorLabel, "Fill in the password fields!");
         } else if (!p1.equals(p2)) {
-            showErrorMessage(errorLabel, "Şifreler uyuşmuyor!");
+            showErrorMessage(errorLabel, "The passwords do not match!");
         } else {
             User user = db.getUser(email);
             if (user != null) {
                 user.setPassword(p1);
                 db.saveUser(user);
-                System.out.println("Şifre başarıyla güncellendi.");
+                System.out.println("Password successfully updated.");
 
                 errorLabel.setVisible(false);
                 hideAll();
             } else {
-                showErrorMessage(errorLabel, "Kullanıcı bulunamadı!");
+                showErrorMessage(errorLabel, "User not found!");
             }
         }
     }
@@ -213,7 +221,14 @@ public class LoginController {
     @FXML public void showForgotPassword() { hideAll(); overlay.setVisible(true); forgotPasswordBox.setVisible(true); }
     @FXML public void showSetPassword() { hideAll(); overlay.setVisible(true); setPasswordBox.setVisible(true); }
     @FXML public void showInterests() { hideAll(); overlay.setVisible(true); interestsBox.setVisible(true); }
-    @FXML public void hideInterests() { interestsBox.setVisible(false); overlay.setVisible(false); }
+    @FXML public void hideInterests() {
+        if (interestsBox != null) {
+            interestsBox.setVisible(false);
+        }
+        if (signUpBox != null) {
+            signUpBox.setVisible(true);
+        }
+    }
 
     @FXML
     public void toggleInterest(ActionEvent event) {
@@ -234,6 +249,10 @@ public class LoginController {
         if (interestsBox != null) interestsBox.setVisible(false);
         if (setPasswordBox != null) setPasswordBox.setVisible(false);
         if (verificationCodeField != null) verificationCodeField.clear();
+        if (loginErrorLabel != null) loginErrorLabel.setVisible(false);
+        if (signUpErrorLabel != null) signUpErrorLabel.setVisible(false);
+        if (errorLabel != null) errorLabel.setVisible(false);
+        if (errorLabel != null) errorLabel.setVisible(false);
     }
 
     private void showErrorMessage(Label label, String message) {
