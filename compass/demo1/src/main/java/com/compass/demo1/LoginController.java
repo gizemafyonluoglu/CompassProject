@@ -196,8 +196,13 @@ public class LoginController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/compass/demo1/mainPage.fxml"));
             Parent mainRoot = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(mainRoot, 900, 600));
-            stage.centerOnScreen();
+
+            boolean wasFullScreen = stage.isFullScreen();
+            double currentWidth = stage.getWidth();
+            double currentHeight = stage.getHeight();
+
+            stage.setScene(new Scene(mainRoot, currentWidth, currentHeight));
+            stage.setFullScreen(wasFullScreen);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
