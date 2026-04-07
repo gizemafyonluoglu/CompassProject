@@ -63,6 +63,7 @@ public class CreateActivityController {
         }
     }
 
+
     @FXML
     public void handleSubmit(ActionEvent event) {
         try {
@@ -100,7 +101,7 @@ public class CreateActivityController {
                 );
             }
 
-
+            newActivity.setProfilePhotoBase64(me.getProfilePhotoBase64());
             newActivity.addParticipant(me);
 
 

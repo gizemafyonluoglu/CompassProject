@@ -18,6 +18,8 @@ public class Activity {
     private String activityType;
     private boolean isCancelled;
     private List<User> joinedUsers;
+    private String profilePhotoBase64;
+
 
     public Activity(String activityId, String activityName, String description, String category, String place, 
                     LocalDate date, LocalTime time, int quota, String visibility, String activityType) {
@@ -89,7 +91,11 @@ public class Activity {
         return place; 
     }
 
-    public void setPlace(String place) { 
+    public String getProfilePhotoBase64() {
+        return profilePhotoBase64;
+    }
+
+    public void setPlace(String place) {
         this.place = place; 
     }
  
@@ -160,5 +166,9 @@ public class Activity {
         }
 
         return false;
+    }
+
+    public void setProfilePhotoBase64(String profilePhotoBase64) {
+        this.profilePhotoBase64 = profilePhotoBase64;
     }
 }
