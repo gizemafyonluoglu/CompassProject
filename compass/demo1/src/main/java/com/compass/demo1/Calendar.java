@@ -40,6 +40,17 @@ public class Calendar {
     public void removeActivity(Activity activity) {
         activities.remove(activity);
     }
+    public void removeExpiredActivities() {
+        List<Activity> activeActivities = new ArrayList<>();
+
+        for (Activity activity : activities) {
+            if (activity != null && !activity.isExpired() && !activity.isCancelled()) {
+                activeActivities.add(activity);
+            }
+        }
+
+        activities = activeActivities;
+    }
 
     public boolean checkConflict(Activity activity) {
         if (activity == null){ 
@@ -94,6 +105,7 @@ public class Calendar {
     }
 
     public List<Activity> getActivities() { 
+        removeExpiredActivities();
         return new ArrayList<>(activities); 
     }
 
