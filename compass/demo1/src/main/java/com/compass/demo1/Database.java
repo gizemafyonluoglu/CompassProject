@@ -579,11 +579,19 @@ public class Database {
                     String uemail = userDoc.getString("email");
                     String upass = userDoc.getString("password");
                     User participant = new User(uid, uname, usurname, uemail, upass);
+                    String photoBase64 = userDoc.getString("profilePhotoBase64");
+                    if (photoBase64 != null && !photoBase64.isEmpty()) {
+                        participant.setProfilePhotoBase64(photoBase64);
+                    }
                     activity.addParticipant(participant);
                 }
             }
         }
 
+        String actPhoto = doc.getString("profilePhotoBase64");
+        if (actPhoto != null && !actPhoto.isEmpty()) {
+            activity.setProfilePhotoBase64(actPhoto);
+        }
         return activity;
     }
 
@@ -609,6 +617,7 @@ public class Database {
         doc.append("description", activity.getDescription());
         doc.append("category", activity.getCategory());
         doc.append("place", activity.getPlace());
+        doc.append("profilePhotoBase64", activity.getJoinedUsers().get(0).getProfilePhotoBase64());
         doc.append("date", dateStr);
         doc.append("time", timeStr);
         doc.append("quota", activity.getQuota());
@@ -683,9 +692,18 @@ public class Database {
                     String uemail = userDoc.getString("email");
                     String upass = userDoc.getString("password");
                     User participant = new User(uid, uname, usurname, uemail, upass);
+                    String photoBase64 = userDoc.getString("profilePhotoBase64");
+                    if (photoBase64 != null && !photoBase64.isEmpty()) {
+                        participant.setProfilePhotoBase64(photoBase64);
+                    }
                     activity.addParticipant(participant);
                 }
             }
+        }
+
+        String actPhoto = doc.getString("profilePhotoBase64");
+        if (actPhoto != null && !actPhoto.isEmpty()) {
+            activity.setProfilePhotoBase64(actPhoto);
         }
 
         return activity;

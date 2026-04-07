@@ -79,6 +79,12 @@ public class CreateActivityController {
             LocalTime time = LocalTime.parse(rawTime);
 
             int quota = Integer.parseInt(inpQuota.getText());
+            if (quota <= 1) {
+                lblErrorMessage.setText("Quota cannot be 1 or less!");
+                if (overlay != null) overlay.setVisible(true);
+                errorPopup.setVisible(true);
+                return; // Kaydetme işlemine geçmeden metodu durdur
+            }
             String visibility = (switchVisibility != null && switchVisibility.isSelected()) ? "Friends Only" : "Public";
 
 
@@ -125,7 +131,7 @@ public class CreateActivityController {
             goToHome(event);
 
         } catch (Exception e) {
-            lblErrorMessage.setText("Please fill in all the fields!");
+            lblErrorMessage.setText("Please fill in all the fields correctly!");
             if (overlay != null) overlay.setVisible(true);
             errorPopup.setVisible(true);
 
