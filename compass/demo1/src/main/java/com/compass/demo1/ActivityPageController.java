@@ -97,16 +97,36 @@ public class ActivityPageController {
         }
 
 
+
+
         profileView.setFitHeight(30);
         profileView.setFitWidth(30);
         profileView.setClip(new javafx.scene.shape.Circle(15, 15, 15));
 
+        // --- YEŞİL TİK (BADGE) EKLENTİSİ BAŞLANGICI ---
+        StackPane profileBox = new StackPane();
+        profileBox.setPrefSize(30, 30);
+        profileBox.getChildren().add(profileView);
+
+        // Eğer aktivite bir kulüp aktivitesiyse yeşil tiki ekliyoruz
+        if (act instanceof ClubActivity) {
+            Label badge = new Label("✔");
+            // Activity sayfasında fotolar 30x30 olduğu için tik boyutunu orantılı olarak biraz ufaltıyoruz
+            badge.setStyle("-fx-background-color: white; -fx-text-fill: #16A34A; -fx-font-size: 8px; " +
+                    "-fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 0 3 0 3; " +
+                    "-fx-border-color: #16A34A; -fx-border-radius: 10; -fx-border-width: 1.5;");
+            StackPane.setAlignment(badge, Pos.BOTTOM_RIGHT);
+            badge.setTranslateX(4);
+            badge.setTranslateY(4);
+            profileBox.getChildren().add(badge);
+        }
+        // --- YEŞİL TİK EKLENTİSİ BİTİŞİ ---
 
         Label lblName = new Label(act.getActivityName());
         lblName.setStyle("-fx-font-weight: bold;");
 
-
-        nameBox.getChildren().addAll(profileView, lblName);
+        // nameBox'a profileView yerine katmanlı yapımız olan profileBox'ı ekliyoruz
+        nameBox.getChildren().addAll(profileBox, lblName);
 
         Label lblPlace = new Label(act.getPlace());
         lblPlace.getStyleClass().add("badge-blue");
