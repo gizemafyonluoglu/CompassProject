@@ -13,6 +13,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.control.Button;
+import java.util.ArrayList;
+import java.util.List;
 
 import java.io.IOException;
 
@@ -153,6 +156,10 @@ public class LoginController {
 
                 String newUserId = "U" + System.currentTimeMillis();
                 User newUser = new User(newUserId, name, surname, email, p1);
+
+                List<Interest> selectedInterests = getSelectedSignUpInterests();
+                newUser.setInterests(selectedInterests);
+
                 db.saveUser(newUser);
                 SessionManager.setCurrentUser(newUser);
 
@@ -267,5 +274,39 @@ public class LoginController {
             label.setStyle("-fx-text-fill: red;");
             label.setVisible(true);
         }
+    }
+    private List<Interest> getSelectedSignUpInterests() {
+        List<Interest> selectedInterests = new ArrayList<>();
+        int idCounter = 1;
+
+        if (interestsBox == null) {
+            return selectedInterests;
+        }
+
+        collectSelectedInterests(interestsBox, selectedInterests, idCounter);
+        return selectedInterests;
+    }
+
+    private int collectSelectedInterests(Parent parent, List<Interest> selectedInterests, int idCounter) {
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (child instanceof Button) {
+                Button button = (Button) child;
+
+                if (button.getStyleClass().contains("selected")) {
+                    String interestName = button.getText() == null ? "" : button.getText().trim();
+
+                    if (!interestName.isEmpty()) {
+                        selectedInterests.add(new Interest("INT" + idCounter, interestName));
+                        idCounter++;
+                    }
+                }
+            }
+
+            if (child instanceof Parent) {
+                idCounter = collectSelectedInterests((Parent) child, selectedInterests, idCounter);
+            }
+        }
+
+        return idCounter;
     }
 }
