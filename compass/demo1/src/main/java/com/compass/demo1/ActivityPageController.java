@@ -313,7 +313,14 @@ public class ActivityPageController {
         Parent root = loader.load();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         boolean wasFullScreen = stage.isFullScreen();
-        stage.setScene(new Scene(root));
+        double currentWidth = stage.getWidth();
+        double currentHeight = stage.getHeight();
+        stage.setScene(new Scene(root, currentWidth, currentHeight));
+        if (!wasFullScreen) {
+            stage.setWidth(currentWidth);
+            stage.setHeight(currentHeight);
+            stage.centerOnScreen();
+        }
         stage.setFullScreen(wasFullScreen);
         stage.show();
     }
