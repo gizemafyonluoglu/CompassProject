@@ -22,30 +22,20 @@ public class FriendsController {
     @FXML private Label pageTitle;
     @FXML private Label recentSearchesLabel;
 
-    // Sadece 2 ekranımız var: Blocked modu AÇIK veya KAPALI
     private boolean isBlockedScreen = false;
-
-    // İLERİDE VERİTABANINDAN GELECEK: Sistemdeki Tüm Kullanıcılar
     private List<User> allUsersInDatabase;
 
     @FXML
     public void initialize() {
-        // --- SİHRİN GERÇEKLEŞTİĞİ YER ---
-        // Artık test verileriyle uğraşmıyoruz, tüm kullanıcıları direkt DB'den çekiyoruz!
         allUsersInDatabase = Database.getInstance().getAllUsers();
-
-        // Sayfa açılışında Friends ekranını çiz
         renderList("");
-
-        // Arama yapıldıkça ekranı anlık güncelle
         searchField.textProperty().addListener((obs, oldVal, newVal) -> {
             renderList(newVal);
-            // Friends ekranında arama yapılıyorsa "Recent Searches" yazısını göster
             recentSearchesLabel.setVisible(!newVal.isEmpty() && !isBlockedScreen);
         });
     }
 
-    // --- 2 EKRANLI ÇİZİM MANTIĞI ---
+    // --- 2-SCREEN DRAWING LOGIC ---
     private void renderList(String searchText) {
         usersListContainer.getChildren().clear();
         String filter = searchText.toLowerCase();
@@ -54,7 +44,7 @@ public class FriendsController {
         if (me == null) return;
 
         if (isBlockedScreen) {
-            // EKRAN 2: Sadece engellenenler ve onlar arasında arama
+            // Screen 2: Only blocked friends
             for (User user : me.getBlockedUsers()) {
                 String fullName = (user.getName() + " " + user.getSurname()).toLowerCase();
                 if (fullName.contains(filter)) {
@@ -62,16 +52,15 @@ public class FriendsController {
                 }
             }
         } else {
-            // EKRAN 1: Friends Ekranı
+            // Screen 1: Friends screen
             if (searchText.isEmpty()) {
                 // Arama yokken sadece arkadaşlar
                 for (User user : me.getFriends()) {
                     usersListContainer.getChildren().add(createUserRow(user, "FRIEND"));
                 }
             } else {
-                // Arama varken engelli OLMAYAN herkes (Arkadaşlar + Yabancılar)
+                // Everyone who is not blocked while the call is active (Friends + Strangers)
                 for (User user : allUsersInDatabase) {
-                    // Kendimizi veya engellediklerimizi arama sonucunda gösterme
                     if (user.equals(me) || me.getBlockedUsers().contains(user)) continue;
 
                     String fullName = (user.getName() + " " + user.getSurname()).toLowerCase();
@@ -91,7 +80,7 @@ public class FriendsController {
         row.getStyleClass().add("card-row");
         row.setPadding(new Insets(10, 20, 10, 20));
 
-        // İkon ve İsim
+        // Icon and name
         HBox nameBox = new HBox(15); nameBox.setAlignment(Pos.CENTER_LEFT);
         Label iconLabel = new Label("👤");
         iconLabel.setStyle("-fx-background-color: #F3E8FF; -fx-text-fill: #8A2BE2; -fx-font-size: 18; -fx-padding: 10; -fx-background-radius: 50;");
@@ -101,7 +90,6 @@ public class FriendsController {
 
         Region spacer = new Region(); HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Dinamik Ortak İlgi Alanları (İki kullanıcının Interest objelerini karşılaştırıyoruz)
         HBox interestsBox = new HBox(10); interestsBox.setAlignment(Pos.CENTER); interestsBox.setPrefWidth(200);
         User me = SessionManager.getCurrentUser();
 
@@ -118,7 +106,6 @@ public class FriendsController {
             }
         }
 
-        // Dinamik Butonlar
         Button actionBtn = new Button(); actionBtn.setPrefWidth(120);
 
         if (status.equals("FRIEND")) {
@@ -136,7 +123,7 @@ public class FriendsController {
         return row;
     }
 
-    // Ekranlar arası geçiş (Toggle)
+    // Toggle
     @FXML
     public void toggleView() {
         isBlockedScreen = !isBlockedScreen;
@@ -145,12 +132,9 @@ public class FriendsController {
         renderList("");
     }
 
-    // Buton işlemleri (Senin User sınıfındaki metotlarla veriyi güncelle, DB'ye kaydet ve ekranı yenile)
     private void handleAction(User targetUser, String action) {
         User me = SessionManager.getCurrentUser();
         if (me == null) return;
-
-        // Senin User.java içindeki klas OOP metotların çalışıyor
         if (action.equals("BLOCK")) {
             me.blockUser(targetUser);
         } else if (action.equals("UNBLOCK")) {
@@ -158,14 +142,11 @@ public class FriendsController {
         } else if (action.equals("ADD_FRIEND")) {
             me.addFriend(targetUser);
         }
-
-        // GERÇEK UYGULAMA MANTIĞI: Değişikliği Veritabanına da Kaydet!
         Database.getInstance().saveUser(me);
-
-        renderList(searchField.getText()); // Ekranı son duruma göre yenile
+        renderList(searchField.getText());
     }
 
-    // --- MENÜ GEÇİŞLERİ ---
+    // --- MENU TRANSITIONS ---
     @FXML public void goToProfile(ActionEvent event) throws IOException { switchScene(event, "profilePage.fxml"); }
     @FXML public void goToHome(ActionEvent event) throws IOException { switchScene(event, "mainPage.fxml"); }
     @FXML public void goToActivity(ActionEvent event) throws IOException { switchScene(event, "activityPage.fxml"); }
@@ -175,7 +156,9 @@ public class FriendsController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
         Parent root = loader.load();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(root, 900, 600));
+        boolean wasFullScreen = stage.isFullScreen();
+        stage.setScene(new Scene(root));
+        stage.setFullScreen(wasFullScreen);
         stage.show();
     }
 }

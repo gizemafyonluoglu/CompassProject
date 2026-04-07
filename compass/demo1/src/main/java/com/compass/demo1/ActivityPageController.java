@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import javafx.scene.Cursor;
-import javafx.scene.control.Button;
 
 public class ActivityPageController {
 
@@ -216,67 +215,58 @@ public class ActivityPageController {
     @FXML public void showFilterPopup() { hideAllPopups(); overlay.setVisible(true); filterPopup.setVisible(true); }
     @FXML
     public void applyFilters() {
-        // 1. Ekrandaki Tarih ve Saat verilerini al
+
         LocalDate selectedDate = filterDatePicker.getValue();
 
         LocalTime selectedTime = null;
         String timeText = filterTimeField.getText();
         if (timeText != null && !timeText.trim().isEmpty()) {
             try {
-                // Kullanıcının girdiği "18:00" metnini Java'nın LocalTime objesine çevir
                 selectedTime = LocalTime.parse(timeText.trim());
             } catch (Exception e) {
                 System.out.println("Saat formatı hatalı, filtreye dahil edilmedi.");
             }
         }
 
-        // FXML popup'ında Location ve ActivityType için ayrı bir giriş kutumuz yoktu.
-        // Location zaten ana ekrandaki Search Bar'dan aranabiliyor. O yüzden bunları null geçiyoruz.
         String locationFilter = null;
         String typeFilter = null;
 
-        // 2. SENİN ActivityFilter SINIFINI ÇALIŞTIR
         ActivityFilter myFilter = new ActivityFilter(selectedDate, selectedTime, locationFilter, typeFilter);
-
-        // Bütün aktiviteleri senin yazdığın metoda gönderip filtrelenmiş listeyi alıyoruz
         List<Activity> filteredList = myFilter.applyFilter(allActivities);
 
 
-        // 3. İLGİ ALANLARI (INTERESTS) İÇİN EK FİLTRELEME
-        // (ActivityFilter sınıfında kategori listesi olmadığı için bunu Controller'da hallediyoruz)
+
         List<String> selectedInterests = new ArrayList<>();
         for (Node node : interestsFlowPane.getChildren()) {
             if (node instanceof ToggleButton) {
                 ToggleButton tb = (ToggleButton) node;
                 if (tb.isSelected()) {
-                    selectedInterests.add(tb.getText()); // Tıklanmış butonların metnini al (Music, Arts vb.)
+                    selectedInterests.add(tb.getText()); 
                 }
             }
         }
 
-        // Eğer ekranda en az bir ilgi alanı seçildiyse, senin filtrenden geçenleri bir de buna göre daralt
         if (!selectedInterests.isEmpty()) {
             List<Activity> interestFilteredList = new ArrayList<>();
             for (Activity act : filteredList) {
-                // Eğer aktivitenin kategorisi, seçilen butonlardan biriyle eşleşiyorsa ekle
+
                 if (selectedInterests.contains(act.getCategory())) {
                     interestFilteredList.add(act);
                 }
             }
-            filteredList = interestFilteredList; // Son listeyi güncelle
+            filteredList = interestFilteredList; 
         }
 
-        // 4. FİLTRELENMİŞ LİSTEYİ EKRANA BAS
+  
         activitiesListContainer.getChildren().clear();
         for (Activity act : filteredList) {
-            // Dolu veya iptal edilmiş aktiviteleri gösterme
+
             if (act.isFull() || act.isCancelled()) continue;
 
             HBox row = createActivityRow(act);
             activitiesListContainer.getChildren().add(row);
         }
 
-        // 5. İşlem bitince Pop-up'ı kapat
         hideAllPopups();
     }
 
@@ -296,7 +286,9 @@ public class ActivityPageController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
         Parent root = loader.load();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(root, 900, 600));
+        boolean wasFullScreen = stage.isFullScreen();
+        stage.setScene(new Scene(root));
+        stage.setFullScreen(wasFullScreen);
         stage.show();
     }
 
@@ -306,17 +298,15 @@ public class ActivityPageController {
             Parent root = loader.load();
 
             ActivityDetailController controller = loader.getController();
-            // Buraya dikkat: Activity class'ında getCreatorName gibi metodların olduğunu varsayıyorum
-            // Eğer yoksa act.getOwnerId() üzerinden User çekmen gerekebilir.
             controller.setActivityData(
-                    act.getActivityName(), // Veya oluşturanın ismi
+                    act.getActivityName(), 
                     act.getDescription(),
-                    null // Şimdilik default icon kullansın diye null
+                    null
             );
 
             Stage popupStage = new Stage();
             popupStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-            popupStage.initStyle(javafx.stage.StageStyle.UNDECORATED); // Görseldeki gibi sade çerçeve
+            popupStage.initStyle(javafx.stage.StageStyle.UNDECORATED);
 
             Scene scene = new Scene(root);
             popupStage.setScene(scene);

@@ -98,7 +98,7 @@ public class LoginController {
             pendingSignUpEmail = email;
 
             EmailSender.sendVerificationEmail(email, currentVerificationCode);
-            System.out.println("Kayıt doğrulama kodu gönderildi: " + currentVerificationCode);
+            System.out.println("Registration verification code sent: " + currentVerificationCode);
 
             isSignUpVerification = true;
 
@@ -128,7 +128,7 @@ public class LoginController {
             pendingForgotPasswordEmail = email;
 
             EmailSender.sendForgotPassword(email, currentVerificationCode);
-            System.out.println("Şifre sıfırlama kodu gönderildi: " + currentVerificationCode);
+            System.out.println("Password reset code sent: " + currentVerificationCode);
 
             isSignUpVerification = false;
 
@@ -209,8 +209,9 @@ public class LoginController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/compass/demo1/AdminPanel.fxml"));
             Parent mainRoot = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(mainRoot, 900, 600));
-            stage.centerOnScreen();
+            boolean wasFullScreen = stage.isFullScreen();
+            stage.setScene(new Scene(mainRoot));
+            stage.setFullScreen(wasFullScreen); 
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();

@@ -140,8 +140,10 @@ public class AdminPanelController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("loginPage.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root, 1000, 650));
-            stage.centerOnScreen();
+            boolean wasFullScreen = stage.isFullScreen();
+            stage.setScene(new Scene(root));
+            stage.setFullScreen(wasFullScreen);
+            stage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
