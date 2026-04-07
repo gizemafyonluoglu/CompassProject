@@ -131,11 +131,10 @@ public class Database {
     }
 
     public List<Activity> getActivities() {
-        removeExpiredActivitiesFromDatabase();
         List<Activity> activities = new ArrayList<>();
         for (Document doc : activitiesCol.find(eq("isCancelled", false))) {
             Activity a = documentToActivity(doc);
-            if (a != null && !a.isExpired()) {
+            if (a != null) {
                 activities.add(a);
             }
         }
@@ -143,22 +142,14 @@ public class Database {
     }
 
     public Activity getActivityById(String activityId) {
-        if (activityId == null){
+        if (activityId == null) {
             return null;
         }
         Document doc = activitiesCol.find(eq("activityId", activityId)).first();
-        if (doc == null){
+        if (doc == null) {
             return null;
         }
-        Activity activity = documentToActivity(doc);
-        if (activity == null){
-            return null;
-        }
-        if (activity.isExpired()){
-            activitiesCol.updateOne(eq("activityId", activityId), set("isCancelled", true));
-            return null;
-        }
-        return activity;
+        return documentToActivity(doc);
     }
 
     public void removeActivity(String activityId) {
@@ -788,30 +779,6 @@ public class Database {
         MembershipRequest req = new MembershipRequest(requestId, documentPath, clubName, submissionDate, userId);
         req.setStatus(status);
         return req;
-    }
-    private List<Activity> getActivitiesIncludingExpired() {
-        List<Activity> activities = new ArrayList<>();
-
-        for (Document doc : activitiesCol.find()) {
-            Activity a = documentToActivity(doc);
-            if (a != null) {
-                activities.add(a);
-            }
-        }
-
-        return activities;
-    }
-    public void removeExpiredActivitiesFromDatabase() {
-        List<Activity> activities = getActivitiesIncludingExpired();
-
-        for (Activity activity : activities) {
-            if (activity != null && activity.isExpired()) {
-                activitiesCol.updateOne(
-                    eq("activityId", activity.getActivityId()),
-                    set("isCancelled", true)
-                );
-            }
-        }
     }
 
     
