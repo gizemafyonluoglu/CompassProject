@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import javafx.scene.Cursor;
+import javafx.scene.control.Button;
 
 public class ActivityPageController {
 
@@ -295,10 +296,7 @@ public class ActivityPageController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
         Parent root = loader.load();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        boolean wasFullScreen = stage.isFullScreen();
-        stage.setScene(new Scene(root)); 
-        stage.setFullScreen(wasFullScreen); 
-
+        stage.setScene(new Scene(root, 900, 600));
         stage.show();
     }
 
