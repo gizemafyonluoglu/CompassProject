@@ -193,4 +193,16 @@ public class User {
     public int hashCode() {
         return userId != null ? userId.hashCode() : 0;
     }
+    public void setInterests(List<Interest> interests) {
+    this.interests = new ArrayList<>(interests);
+}
+
+    public void addInterest(Interest interest) {
+        if (interest != null && !interests.contains(interest)) {
+            interests.add(interest);
+        }
+    }
+    public void removeInterest(Interest interest) {
+        interests.remove(interest);
+    }
 }
