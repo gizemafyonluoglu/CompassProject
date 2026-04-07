@@ -333,7 +333,7 @@ public class ActivityPageController {
 
             ActivityDetailController controller = loader.getController();
             controller.setActivityData(
-                    act.getActivityName(), 
+                    act.getJoinedUsers().get(0).getName() + act.getJoinedUsers().get(0).getSurname(),
                     act.getDescription(),
                     null
             );
