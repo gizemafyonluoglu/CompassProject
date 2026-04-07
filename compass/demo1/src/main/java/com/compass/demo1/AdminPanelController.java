@@ -131,19 +131,17 @@ public class AdminPanelController {
 
     @FXML
     public void handleConfirmSignOut(ActionEvent event) {
+        // Oturumu tamamen temizle
         SessionManager.setCurrentUser(null);
         System.out.println("Admin çıkış yaptı.");
 
         try {
+            // Çıkış yapınca kişiyi loginPage'e geri gönder
             FXMLLoader loader = new FXMLLoader(getClass().getResource("loginPage.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            boolean wasFullScreen = stage.isFullScreen();
-            stage.setScene(new Scene(root));
-            stage.setFullScreen(wasFullScreen);
-            stage.show();
-
+            stage.setScene(new Scene(root, 1000, 650));
+            stage.centerOnScreen();
         } catch (IOException e) {
             e.printStackTrace();
         }
