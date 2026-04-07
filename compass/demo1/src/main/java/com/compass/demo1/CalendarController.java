@@ -197,7 +197,7 @@ public class CalendarController {
             renderCalendar(); 
 
         } catch (Exception e) {
-            System.out.println("HATA: Saat formatı hatalı girildi (örn: 14:00 şeklinde girin)");
+            System.out.println("ERROR: The time format was entered incorrectly (e.g., enter 14:00)");
             e.printStackTrace();
         }
     }

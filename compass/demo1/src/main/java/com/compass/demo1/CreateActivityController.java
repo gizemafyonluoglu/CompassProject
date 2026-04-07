@@ -83,7 +83,7 @@ public class CreateActivityController {
                 lblErrorMessage.setText("Quota cannot be 1 or less!");
                 if (overlay != null) overlay.setVisible(true);
                 errorPopup.setVisible(true);
-                return; // Kaydetme işlemine geçmeden metodu durdur
+                return;
             }
             String visibility = (switchVisibility != null && switchVisibility.isSelected()) ? "Friends Only" : "Public";
 
@@ -93,7 +93,6 @@ public class CreateActivityController {
             User me = SessionManager.getCurrentUser();
             Activity newActivity;
 
-            //club or regular activity
             if (switchType != null && switchType.isSelected() && me instanceof ClubBoardMember) {
                 ClubBoardMember boardMember = (ClubBoardMember) me;
                 newActivity = new ClubActivity(
@@ -198,7 +197,6 @@ public class CreateActivityController {
         Parent root = loader.load();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         Scene scene = new Scene(root, stage.getScene().getWidth(), stage.getScene().getHeight());
-        //stage.setScene(new Scene(root, 900, 600));
         stage.setScene(scene);
         stage.show();
     }

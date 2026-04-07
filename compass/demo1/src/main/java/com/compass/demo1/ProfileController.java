@@ -154,7 +154,7 @@ public class ProfileController {
 
             } catch (IOException e) {
                 e.printStackTrace();
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Fotoğraf yüklenirken hata oluştu!", ButtonType.OK);
+                Alert alert = new Alert(Alert.AlertType.ERROR, "An error occurred while uploading the photo!", ButtonType.OK);
                 alert.showAndWait();
             }
         }
@@ -163,7 +163,7 @@ public class ProfileController {
     @FXML
     public void handleFileUpload() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF veya Resim", "*.pdf", "*.png", "*.jpg"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF or photo", "*.pdf", "*.png", "*.jpg"));
         Stage stage = (Stage) overlay.getScene().getWindow();
         File selectedFile = fileChooser.showOpenDialog(stage);
         if (selectedFile != null) {

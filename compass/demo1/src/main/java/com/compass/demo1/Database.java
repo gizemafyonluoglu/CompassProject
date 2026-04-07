@@ -361,7 +361,7 @@ public class Database {
         Updates.combine(
             Updates.set("userType", "ClubBoardMember"),
             Updates.set("boardStatusApproved", true),
-            Updates.set("clubName", clubName) // KULLANICININ KULÜP ADINI BURADA EKLİYORSUN
+            Updates.set("clubName", clubName)
         )
     );
 }
@@ -383,19 +383,17 @@ public class Database {
             user = new Admin(userId, name, surname, email, password);
 
         } 
-        //else if(doc.getBoolean("boardStatusApproved")){
-            else if ("ClubBoardMember".equals(userType)) {
-                String clubName = doc.getString("clubName");
-                ClubBoardMember cbm = new ClubBoardMember(userId, name, surname, email, password, clubName);
-                Boolean approved = doc.getBoolean("boardStatusApproved");
-                if (approved != null && approved) {
-                    cbm.setBoardStatusApproved(true);
-                } else {
-                    cbm.setBoardStatusApproved(false);
-                }
-                user = cbm;
-
-            //} 
+        
+        else if ("ClubBoardMember".equals(userType)) {
+            String clubName = doc.getString("clubName");
+            ClubBoardMember cbm = new ClubBoardMember(userId, name, surname, email, password, clubName);
+            Boolean approved = doc.getBoolean("boardStatusApproved");
+            if (approved != null && approved) {
+                cbm.setBoardStatusApproved(true);
+            } else {
+                cbm.setBoardStatusApproved(false);
+            }
+            user = cbm; 
         }
         else {
             user = new User(userId, name, surname, email, password);

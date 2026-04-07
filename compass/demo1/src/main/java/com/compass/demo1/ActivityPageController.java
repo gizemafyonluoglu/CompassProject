@@ -45,18 +45,15 @@ public class ActivityPageController {
 
         if (me != null && me.getFriends() != null && !me.getFriends().isEmpty()) {
             
-            // Kolay arama yapmak için arkadaşların ID'lerini bir listeye alalım
             List<String> friendIds = new ArrayList<>();
             for (User friend : me.getFriends()) {
                 friendIds.add(friend.getUserId());
             }
 
-            // allActivities listesini sırala
             allActivities.sort((act1, act2) -> {
                 boolean act1HasFriend = false;
                 boolean act2HasFriend = false;
 
-                // 1. Aktivitede (act1) herhangi bir arkadaşımız var mı?
                 for (User u : act1.getJoinedUsers()) {
                     if (friendIds.contains(u.getUserId())) {
                         act1HasFriend = true;
@@ -64,7 +61,6 @@ public class ActivityPageController {
                     }
                 }
 
-                // 2. Aktivitede (act2) herhangi bir arkadaşımız var mı?
                 for (User u : act2.getJoinedUsers()) {
                     if (friendIds.contains(u.getUserId())) {
                         act2HasFriend = true;
@@ -72,12 +68,9 @@ public class ActivityPageController {
                     }
                 }
 
-                // Karşılaştırma Mantığı:
-                // Eğer act1'de arkadaş varsa ve act2'de yoksa, act1'i yukarı taşı (-1)
+                
                 if (act1HasFriend && !act2HasFriend) return -1;
-                // Eğer act2'de arkadaş varsa ve act1'de yoksa, act2'yi yukarı taşı (1)
                 if (!act1HasFriend && act2HasFriend) return 1;
-                // İkisinde de arkadaş varsa veya ikisinde de yoksa sıralamayı bozma (0)
                 return 0;
             });
         }
@@ -249,7 +242,6 @@ public class ActivityPageController {
 
         row.getChildren().addAll(nameBox, lblPlace, lblDate, lblTime, lblQuota, spacer, actionBtn);
 
-        //ACTİVİTY DETAİL
 
         row.setCursor(javafx.scene.Cursor.HAND);
         row.setOnMouseClicked(event -> {
@@ -371,12 +363,11 @@ public class ActivityPageController {
                 String actCategory = act.getCategory();
                 
                 if (actCategory != null) {
-                    // Seçilen ilgi alanlarından HERHANGİ BİRİ bu aktivitenin kategorisinde geçiyor mu?
                     boolean matchFound = false;
                     for (String interest : selectedInterests) {
                         if (actCategory.contains(interest)) {
                             matchFound = true;
-                            break; // Bir tane bile eşleşme bulursak aktiviteyi listeye almak yeterli
+                            break; 
                         }
                     }
                     

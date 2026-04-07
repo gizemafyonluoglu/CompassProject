@@ -14,7 +14,7 @@ import java.util.Properties;
 public class EmailSender {
 
     private static final String EMAIL_FROM = "compass.bilkent@gmail.com";
-    private static final String APP_PASSWORD = "fjrgrjsoqmaprard"; // no spaces
+    private static final String APP_PASSWORD = "fjrgrjsoqmaprard"; 
 
     public static void sendVerificationEmail(String toEmail, String code) {
         String subject = "Verification Code";
