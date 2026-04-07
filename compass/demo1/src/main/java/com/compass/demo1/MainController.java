@@ -58,16 +58,32 @@ public class MainController {
         row.setPadding(new Insets(10, 20, 10, 20));
         StackPane profileBox = new StackPane();
         profileBox.setPrefSize(40, 40);
+
         ImageView profileView = new ImageView();
-        try {
-            Image img = new Image(getClass().getResourceAsStream("icons/default_user.png"));
-            profileView.setImage(img);
-        } catch (Exception e) {
-            profileView.setImage(new Image(getClass().getResourceAsStream("icons/user.png")));
+        String photoBase64 = act.getProfilePhotoBase64();
+
+        if (photoBase64 != null && !photoBase64.isEmpty()) {
+            try {
+
+                byte[] imageBytes = java.util.Base64.getDecoder().decode(photoBase64);
+                profileView.setImage(new Image(new java.io.ByteArrayInputStream(imageBytes)));
+            } catch (Exception e) {
+
+                profileView.setImage(new Image(getClass().getResourceAsStream("icons/default_user.png")));
+            }
+        } else {
+
+            try {
+                profileView.setImage(new Image(getClass().getResourceAsStream("icons/default_user.png")));
+            } catch (Exception e) {
+                System.out.println("Default image not found");
+            }
         }
+
         profileView.setFitHeight(40);
         profileView.setFitWidth(40);
-        profileView.setClip(new Circle(20, 20, 20));
+        profileView.setClip(new javafx.scene.shape.Circle(20, 20, 20));
+
         profileBox.getChildren().add(profileView);
         if (act instanceof ClubActivity) {
             Label badge = new Label("✔");
