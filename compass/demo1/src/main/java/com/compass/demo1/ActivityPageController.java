@@ -276,9 +276,21 @@ public class ActivityPageController {
         if (!selectedInterests.isEmpty()) {
             List<Activity> interestFilteredList = new ArrayList<>();
             for (Activity act : filteredList) {
-
-                if (selectedInterests.contains(act.getCategory())) {
-                    interestFilteredList.add(act);
+                String actCategory = act.getCategory();
+                
+                if (actCategory != null) {
+                    // Seçilen ilgi alanlarından HERHANGİ BİRİ bu aktivitenin kategorisinde geçiyor mu?
+                    boolean matchFound = false;
+                    for (String interest : selectedInterests) {
+                        if (actCategory.contains(interest)) {
+                            matchFound = true;
+                            break; // Bir tane bile eşleşme bulursak aktiviteyi listeye almak yeterli
+                        }
+                    }
+                    
+                    if (matchFound) {
+                        interestFilteredList.add(act);
+                    }
                 }
             }
             filteredList = interestFilteredList; 
