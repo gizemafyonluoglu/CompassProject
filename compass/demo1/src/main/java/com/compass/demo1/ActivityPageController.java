@@ -55,11 +55,11 @@ public class ActivityPageController {
         String lowerCaseFilter = searchText.toLowerCase();
 
         for (Activity act : allActivities) {
-            if (act.isFull() || act.isCancelled()) continue;
+            if (act.isFull() || act.isCancelled() || hasBlockedUser(act)) continue;
 
-            if (searchText.isEmpty() ||
-                    act.getActivityName().toLowerCase().contains(lowerCaseFilter) ||
-                    act.getPlace().toLowerCase().contains(lowerCaseFilter)) {
+            if (searchText.isEmpty()
+                    || act.getActivityName().toLowerCase().contains(lowerCaseFilter)
+                    || act.getPlace().toLowerCase().contains(lowerCaseFilter)) {
 
                 HBox row = createActivityRow(act);
                 activitiesListContainer.getChildren().add(row);
@@ -254,6 +254,11 @@ public class ActivityPageController {
                     db.saveUser(me);
                 }
             }
+            if (hasBlockedUser(pendingActivity)) {
+            hideAllPopups();
+            renderActivities(searchField.getText());
+            return;
+            }
             renderActivities(searchField.getText());
         }
         hideAllPopups();
@@ -262,6 +267,8 @@ public class ActivityPageController {
     private void joinActivity(Activity act, Button btn) {
         User me = SessionManager.getCurrentUser();
         if (me == null) return;
+        if (hasBlockedUser(act)) return;
+
         for (User u : act.getJoinedUsers()) {
             if (u.getUserId().equals(me.getUserId())) {
                 return; 
@@ -407,5 +414,24 @@ public class ActivityPageController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean hasBlockedUser(Activity act) {
+        User me = SessionManager.getCurrentUser();
+        if (me == null || act == null) return false;
+        if (me.getBlockedUsers() == null) return false;
+
+        for (User joinedUser : act.getJoinedUsers()) {
+            if (joinedUser == null || joinedUser.getUserId() == null) continue;
+
+            for (User blockedUser : me.getBlockedUsers()) {
+                if (blockedUser == null || blockedUser.getUserId() == null) continue;
+
+                if (joinedUser.getUserId().equals(blockedUser.getUserId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
