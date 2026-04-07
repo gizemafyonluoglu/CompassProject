@@ -763,6 +763,7 @@ public class Database {
         Document doc = new Document();
         doc.append("requestId", req.getRequestId());
         doc.append("documentPath", req.getDocumentPath());
+        doc.append("documentBase64", req.getDocumentBase64());
         doc.append("clubName", req.getClubName());
         doc.append("status", req.getStatus());
         doc.append("submissionDate", dateStr);
@@ -788,6 +789,12 @@ public class Database {
 
         MembershipRequest req = new MembershipRequest(requestId, documentPath, clubName, submissionDate, userId);
         req.setStatus(status);
+
+        String docBase64 = doc.getString("documentBase64");
+        if (docBase64 != null && !docBase64.isEmpty()) {
+            req.setDocumentBase64(docBase64);
+        }
+
         return req;
     }
     public void removeExpiredActivitiesFromDatabase() {

@@ -14,7 +14,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 public class AdminPanelController {
@@ -58,7 +61,16 @@ public class AdminPanelController {
 
         HBox topBar = new HBox();
         topBar.setAlignment(Pos.CENTER_LEFT);
-        Label nameLbl = new Label(req.getRequestId());
+
+        String displayName = req.getUserId();
+        if (displayName != null && !displayName.isEmpty()) {
+            User submitter = db.getUserById(displayName);
+            if (submitter != null) {
+                displayName = submitter.getName() + " " + submitter.getSurname();
+            }
+        }
+
+        Label nameLbl = new Label("From: " + displayName);
         nameLbl.setStyle("-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #1E293B;");
 
         Region spacer = new Region();
@@ -78,10 +90,14 @@ public class AdminPanelController {
         fileIcon.setFitHeight(30);
         fileIcon.setPreserveRatio(true);
 
-        Label fileLbl = new Label("User Name " + req.getUserId() + "\nFile: " + req.getDocumentPath());
+        Label fileLbl = new Label("File: " + req.getDocumentPath());
         fileLbl.setStyle("-fx-font-size: 14; -fx-text-fill: #334155;");
 
-        fileArea.getChildren().addAll(fileIcon, fileLbl);
+        Button viewFileBtn = new Button("View");
+        viewFileBtn.setStyle("-fx-background-color: #3B82F6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 5 10; -fx-cursor: hand;");
+        viewFileBtn.setOnAction(e -> openFile(req));
+
+        fileArea.getChildren().addAll(fileIcon, fileLbl, viewFileBtn);
 
         HBox btnArea = new HBox(15);
         btnArea.setAlignment(Pos.CENTER);
@@ -113,7 +129,25 @@ public class AdminPanelController {
         loadPendingRequests();
     }
 
-    // --- Sign Out ve Pop-up Logic ---
+    private void openFile(MembershipRequest req) {
+        String base64 = req.getDocumentBase64();
+        if (base64 == null || base64.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "No file attached to this request.", ButtonType.OK);
+            alert.showAndWait();
+            return;
+        }
+        try {
+            byte[] fileBytes = Base64.getDecoder().decode(base64);
+            String fileName = req.getDocumentPath();
+            File tempFile = new File(System.getProperty("java.io.tmpdir"), fileName);
+            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+                fos.write(fileBytes);
+            }
+            java.awt.Desktop.getDesktop().open(tempFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @FXML
     public void showSignOutPopup() {
