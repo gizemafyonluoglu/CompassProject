@@ -174,7 +174,7 @@ public class CreateActivityController {
 
     @FXML
     public void handleCancel(ActionEvent event) throws IOException {
-        goToActivity(event);
+        goToHome(event);
     }
 
 
@@ -192,6 +192,7 @@ public class CreateActivityController {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         //stage.setScene(new Scene(root, 900, 600));
         Scene scene = new Scene(root, stage.getScene().getWidth(), stage.getScene().getHeight());
+        stage.setScene(scene);
         stage.show();
     }
 }
