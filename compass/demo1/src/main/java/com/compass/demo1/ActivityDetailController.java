@@ -18,12 +18,9 @@ public class ActivityDetailController {
         stage.close();
     }
 
-    // Veriyi dışarıdan (MainPage'den) almak için metod
     public void setActivityData(String name, String description, String imagePath) {
         nameLabel.setText(name);
         descriptionLabel.setText(description);
-
-        // Eğer profil fotosu varsa yükle, yoksa default icon kalsın
         if (imagePath != null && !imagePath.isEmpty()) {
             profileImage.setImage(new Image(imagePath));
         }
