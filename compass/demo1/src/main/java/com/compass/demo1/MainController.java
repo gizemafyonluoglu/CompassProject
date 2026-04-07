@@ -97,7 +97,35 @@ public class MainController {
         }
         Label lblName = new Label(act.getActivityName());
         lblName.setPrefWidth(160);
-        lblName.setStyle("-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: black;");
+
+        boolean isFriend = false;
+        User me = SessionManager.getCurrentUser();
+
+        if (!act.getJoinedUsers().isEmpty()) {
+            User creator = act.getJoinedUsers().get(0);
+
+
+            if (me != null && creator != null && !creator.getUserId().equals(me.getUserId())) {
+                for (User friend : me.getFriends()) {
+                    if (friend.getUserId().equals(creator.getUserId())) {
+                        isFriend = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+
+        if (isFriend) {
+            lblName.setStyle("-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: #16A34A;");
+        } else {
+            lblName.setStyle("-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: black;");
+        }
+
+
+
+
+
         Label lblPlace = new Label(act.getPlace());
         lblPlace.getStyleClass().add("badge-blue");
         lblPlace.setPrefWidth(120);

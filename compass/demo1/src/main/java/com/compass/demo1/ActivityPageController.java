@@ -103,15 +103,15 @@ public class ActivityPageController {
         profileView.setFitWidth(30);
         profileView.setClip(new javafx.scene.shape.Circle(15, 15, 15));
 
-        // --- YEŞİL TİK (BADGE) EKLENTİSİ BAŞLANGICI ---
+
         StackPane profileBox = new StackPane();
         profileBox.setPrefSize(30, 30);
         profileBox.getChildren().add(profileView);
 
-        // Eğer aktivite bir kulüp aktivitesiyse yeşil tiki ekliyoruz
+
         if (act instanceof ClubActivity) {
             Label badge = new Label("✔");
-            // Activity sayfasında fotolar 30x30 olduğu için tik boyutunu orantılı olarak biraz ufaltıyoruz
+
             badge.setStyle("-fx-background-color: white; -fx-text-fill: #16A34A; -fx-font-size: 8px; " +
                     "-fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 0 3 0 3; " +
                     "-fx-border-color: #16A34A; -fx-border-radius: 10; -fx-border-width: 1.5;");
@@ -120,12 +120,38 @@ public class ActivityPageController {
             badge.setTranslateY(4);
             profileBox.getChildren().add(badge);
         }
-        // --- YEŞİL TİK EKLENTİSİ BİTİŞİ ---
+
 
         Label lblName = new Label(act.getActivityName());
-        lblName.setStyle("-fx-font-weight: bold;");
+        lblName.setPrefWidth(160);
 
-        // nameBox'a profileView yerine katmanlı yapımız olan profileBox'ı ekliyoruz
+        boolean isFriend = false;
+        User me = SessionManager.getCurrentUser();
+
+        if (!act.getJoinedUsers().isEmpty()) {
+            User creator = act.getJoinedUsers().get(0);
+
+
+            if (me != null && creator != null && !creator.getUserId().equals(me.getUserId())) {
+                for (User friend : me.getFriends()) {
+                    if (friend.getUserId().equals(creator.getUserId())) {
+                        isFriend = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+
+        if (isFriend) {
+            lblName.setStyle("-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: #16A34A;");
+        } else {
+            lblName.setStyle("-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: black;");
+        }
+
+
+
+
         nameBox.getChildren().addAll(profileBox, lblName);
 
         Label lblPlace = new Label(act.getPlace());
@@ -148,7 +174,7 @@ public class ActivityPageController {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        User me = SessionManager.getCurrentUser();
+
         boolean alreadyJoined = false;
         if (me != null) {
             for (User u : act.getJoinedUsers()) {
