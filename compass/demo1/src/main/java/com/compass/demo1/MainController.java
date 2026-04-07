@@ -1,6 +1,7 @@
 package com.compass.demo1;
 
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -22,6 +23,8 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 public class MainController {
 
@@ -147,13 +150,14 @@ public class MainController {
         String btnColor = isOwner ? "#EF4444" : "#F97316";
         actionBtn.setStyle("-fx-background-color: " + btnColor + "; -fx-text-fill: white; " +
                 "-fx-background-radius: 50; -fx-min-width: 32; -fx-min-height: 32; -fx-cursor: hand;");
-        actionBtn.setOnAction(e -> {
-            if (isOwner) {
-
-                handleCancelProcess(act, row);
-            } else {
-
-                handleLeaveProcess(act, row);
+        actionBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if (isOwner) {
+                    handleCancelProcess(act, row);
+                } else {
+                    handleLeaveProcess(act, row);
+                }
             }
         });
 
@@ -161,10 +165,12 @@ public class MainController {
 
         //ACTİVİTY DETAİL
         row.setCursor(javafx.scene.Cursor.HAND);
-        row.setOnMouseClicked(event -> {
-
-            if (!(event.getTarget() instanceof Button)) {
-                openActivityPopUp(act);
+        row.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+            @Override
+            public void handle(javafx.scene.input.MouseEvent event) {
+                if (!(event.getTarget() instanceof Button)) {
+                    openActivityPopUp(act);
+                }
             }
         });
         activityContainer.getChildren().add(row);
@@ -189,8 +195,18 @@ public class MainController {
                 String btnHover = "-fx-background-color: #6d22b3; -fx-text-fill: white; -fx-background-radius: 15px; -fx-cursor: hand; -fx-padding: 8 20 8 20;";
 
                 okBtn.setStyle(btnNormal);
-                okBtn.setOnMouseEntered(e -> okBtn.setStyle(btnHover));
-                okBtn.setOnMouseExited(e -> okBtn.setStyle(btnNormal));
+                okBtn.setOnMouseEntered(new EventHandler<javafx.scene.input.MouseEvent>() {
+                    @Override
+                    public void handle(javafx.scene.input.MouseEvent event) {
+                        okBtn.setStyle(btnHover);
+                    }
+                });
+                okBtn.setOnMouseExited(new EventHandler<javafx.scene.input.MouseEvent>() {
+                    @Override
+                    public void handle(javafx.scene.input.MouseEvent event) {
+                        okBtn.setStyle(btnNormal);
+                    }
+                });
             }
 
             alert.showAndWait();
@@ -251,16 +267,42 @@ public class MainController {
 
         if (okBtn != null) {
             okBtn.setStyle(btnNormal);
-            okBtn.setOnMouseEntered(e -> okBtn.setStyle(btnHover));
-            okBtn.setOnMouseExited(e -> okBtn.setStyle(btnNormal));
+            okBtn.setOnMouseEntered(new EventHandler<javafx.scene.input.MouseEvent>() {
+                @Override
+                public void handle(javafx.scene.input.MouseEvent event) {
+                    okBtn.setStyle(btnHover);
+                }
+            });
+            okBtn.setOnMouseExited(new EventHandler<javafx.scene.input.MouseEvent>() {
+                @Override
+                public void handle(javafx.scene.input.MouseEvent event) {
+                    okBtn.setStyle(btnNormal);
+                }
+            });
         }
         if (cancelBtn != null) {
             cancelBtn.setStyle(btnNormal);
-            cancelBtn.setOnMouseEntered(e -> cancelBtn.setStyle(btnHover));
-            cancelBtn.setOnMouseExited(e -> cancelBtn.setStyle(btnNormal));
+            cancelBtn.setOnMouseEntered(new EventHandler<javafx.scene.input.MouseEvent>() {
+                @Override
+                public void handle(javafx.scene.input.MouseEvent event) {
+                    cancelBtn.setStyle(btnHover);
+                }
+            });
+            cancelBtn.setOnMouseExited(new EventHandler<javafx.scene.input.MouseEvent>() {
+                @Override
+                public void handle(javafx.scene.input.MouseEvent event) {
+                    cancelBtn.setStyle(btnNormal);
+                }
+            });
         }
 
-        return alert.showAndWait().filter(r -> r == ButtonType.OK).isPresent();
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.filter(new Predicate<ButtonType>() {
+            @Override
+            public boolean test(ButtonType buttonType) {
+                return buttonType == ButtonType.OK;
+            }
+        }).isPresent();
     }
     @FXML public void goToProfile(ActionEvent event) throws IOException { switchScene(event, "profilePage.fxml"); }
     @FXML public void goToFriends(ActionEvent event) throws IOException { switchScene(event, "friendsPage.fxml"); }

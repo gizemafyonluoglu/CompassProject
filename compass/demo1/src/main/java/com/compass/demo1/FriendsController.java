@@ -35,7 +35,6 @@ public class FriendsController {
         });
     }
 
-    // --- 2-SCREEN DRAWING LOGIC ---
     private void renderList(String searchText) {
         usersListContainer.getChildren().clear();
         String filter = searchText.toLowerCase();
@@ -46,12 +45,10 @@ public class FriendsController {
         if (isBlockedScreen) {
 
             if (searchText.isEmpty()) {
-                // Arama yokken sadece arkadaşlar
                 for (User user : me.getBlockedUsers()) {
                     usersListContainer.getChildren().add(createUserRow(user, "BLOCKED"));
                 }
             } else {
-                // Everyone who is not blocked while the call is active (Friends + Strangers)
                 for (User user : allUsersInDatabase) {
                     if (user.equals(me) || me.getBlockedUsers().contains(user)) continue;
 
@@ -64,14 +61,11 @@ public class FriendsController {
             }
 
         } else {
-            // Screen 1: Friends screen
             if (searchText.isEmpty()) {
-                // Arama yokken sadece arkadaşlar
                 for (User user : me.getFriends()) {
                     usersListContainer.getChildren().add(createUserRow(user, "FRIEND"));
                 }
             } else {
-                // Everyone who is not blocked while the call is active (Friends + Strangers)
                 for (User user : allUsersInDatabase) {
                     if (user.equals(me) || me.getBlockedUsers().contains(user)) continue;
 
@@ -85,14 +79,12 @@ public class FriendsController {
         }
     }
 
-    // --- SATIR (KART) TASARIMI OLUŞTURUCU ---
     private HBox createUserRow(User user, String status) {
         HBox row = new HBox(15);
         row.setAlignment(Pos.CENTER_LEFT);
         row.getStyleClass().add("card-row");
         row.setPadding(new Insets(10, 20, 10, 20));
 
-        // Icon and name
         HBox nameBox = new HBox(15); nameBox.setAlignment(Pos.CENTER_LEFT);
         Label iconLabel = new Label("👤");
         iconLabel.setStyle("-fx-background-color: #F3E8FF; -fx-text-fill: #8A2BE2; -fx-font-size: 18; -fx-padding: 10; -fx-background-radius: 50;");
@@ -139,8 +131,6 @@ public class FriendsController {
                 actionBtn.setOnAction(e -> handleAction(user, "REMOVE_FRIEND"));
             }
         }
-        
-        
         row.getChildren().addAll(nameBox, spacer, interestsBox, actionBtn);
         return row;
     }
