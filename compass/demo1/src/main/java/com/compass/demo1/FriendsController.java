@@ -44,13 +44,25 @@ public class FriendsController {
         if (me == null) return;
 
         if (isBlockedScreen) {
-            // Screen 2: Only blocked friends
-            for (User user : me.getBlockedUsers()) {
-                String fullName = (user.getName() + " " + user.getSurname()).toLowerCase();
-                if (fullName.contains(filter)) {
+
+            if (searchText.isEmpty()) {
+                // Arama yokken sadece arkadaşlar
+                for (User user : me.getBlockedUsers()) {
                     usersListContainer.getChildren().add(createUserRow(user, "BLOCKED"));
                 }
+            } else {
+                // Everyone who is not blocked while the call is active (Friends + Strangers)
+                for (User user : allUsersInDatabase) {
+                    if (user.equals(me) || me.getBlockedUsers().contains(user)) continue;
+
+                    String fullName = (user.getName() + " " + user.getSurname()).toLowerCase();
+                    if (fullName.contains(filter)) {
+                        String status = me.getBlockedUsers().contains(user) ? "BLOCKED" : "STRANGER";
+                        usersListContainer.getChildren().add(createUserRow(user, status));
+                    }
+                }
             }
+
         } else {
             // Screen 1: Friends screen
             if (searchText.isEmpty()) {
@@ -107,18 +119,28 @@ public class FriendsController {
         }
 
         Button actionBtn = new Button(); actionBtn.setPrefWidth(120);
-
-        if (status.equals("FRIEND")) {
-            actionBtn.setText("Block"); actionBtn.getStyleClass().add("btn-action-red");
-            actionBtn.setOnAction(e -> handleAction(user, "BLOCK"));
-        } else if (status.equals("BLOCKED")) {
-            actionBtn.setText("Unblock"); actionBtn.getStyleClass().add("btn-action-green");
-            actionBtn.setOnAction(e -> handleAction(user, "UNBLOCK"));
-        } else if (status.equals("STRANGER")) {
-            actionBtn.setText("👤+ Add Friend"); actionBtn.getStyleClass().add("btn-action-blue");
-            actionBtn.setOnAction(e -> handleAction(user, "ADD_FRIEND"));
+        if(isBlockedScreen){
+            if (status.equals("FRIEND")||status.equals("STRANGER")) {
+                actionBtn.setText("Block"); actionBtn.getStyleClass().add("btn-action-red");
+                actionBtn.setOnAction(e -> handleAction(user, "BLOCK"));
+            }
+            else{
+                actionBtn.setText("Unblock"); actionBtn.getStyleClass().add("btn-action-green");
+                actionBtn.setOnAction(e -> handleAction(user, "UNBLOCK"));
+            }
         }
-
+        else{
+            if(status.equals("STRANGER")){
+                actionBtn.setText("👤+ Add Friend"); actionBtn.getStyleClass().add("btn-action-blue");
+                actionBtn.setOnAction(e -> handleAction(user, "ADD_FRIEND"));
+            }
+            else{
+                actionBtn.setText("Unfriend"); actionBtn.getStyleClass().add("btn-action-red");
+                actionBtn.setOnAction(e -> handleAction(user, "REMOVE_FRIEND"));
+            }
+        }
+        
+        
         row.getChildren().addAll(nameBox, spacer, interestsBox, actionBtn);
         return row;
     }
@@ -141,6 +163,8 @@ public class FriendsController {
             me.unblockUser(targetUser);
         } else if (action.equals("ADD_FRIEND")) {
             me.addFriend(targetUser);
+        } else if(action.equals("REMOVE_FRIEND")){
+            me.removeFriend(targetUser);
         }
         Database.getInstance().saveUser(me);
         renderList(searchField.getText());
