@@ -116,10 +116,9 @@ public class MainController {
         row.getChildren().addAll(profileBox, lblName, lblPlace, lblDate, lblTime, lblQuota, spacer, actionBtn);
 
         //ACTİVİTY DETAİL
-        // addActivityRow metodunun sonuna ekle:
-        row.setCursor(javafx.scene.Cursor.HAND); // Mouse üzerine gelince el işareti çıksın
+        row.setCursor(javafx.scene.Cursor.HAND);
         row.setOnMouseClicked(event -> {
-            // Eğer butona basılmadıysa (sadece satıra basıldıysa) aç
+
             if (!(event.getTarget() instanceof Button)) {
                 openActivityPopUp(act);
             }
@@ -134,6 +133,22 @@ public class MainController {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText("Time Conflict!");
             alert.setContentText("The activity starts in less than 3 hours. You cannot cancel.");
+
+            javafx.scene.control.DialogPane dialogPane = alert.getDialogPane();
+            dialogPane.setStyle("-fx-background-color: white; -fx-border-color: #8A2BE2; -fx-border-width: 2px; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-font-size: 14px; -fx-text-fill: #6B7280; -fx-font-weight: bold;");
+            ((Stage) dialogPane.getScene().getWindow()).initStyle(javafx.stage.StageStyle.UNDECORATED);
+
+
+            Button okBtn = (Button) dialogPane.lookupButton(ButtonType.OK);
+            if (okBtn != null) {
+                String btnNormal = "-fx-background-color: #8A2BE2; -fx-text-fill: white; -fx-background-radius: 15px; -fx-cursor: hand; -fx-padding: 8 20 8 20;";
+                String btnHover = "-fx-background-color: #6d22b3; -fx-text-fill: white; -fx-background-radius: 15px; -fx-cursor: hand; -fx-padding: 8 20 8 20;";
+
+                okBtn.setStyle(btnNormal);
+                okBtn.setOnMouseEntered(e -> okBtn.setStyle(btnHover));
+                okBtn.setOnMouseExited(e -> okBtn.setStyle(btnNormal));
+            }
+
             alert.showAndWait();
         } else {
             if (confirmAction("Cancel activity", "Are you sure you want to delete this activity?")) {
@@ -155,7 +170,7 @@ public class MainController {
     }
 
     private void handleLeaveProcess(Activity act, HBox row) {
-        if (confirmAction("Leave the activity", act.getActivityName() + " aktivitesinden ayrılmak istediğine emin misin?")) {
+        if (confirmAction("Leave the activity",   " Are you sure you want to quit "  + act.getActivityName())) {
             User me = SessionManager.getCurrentUser();
             Database db = Database.getInstance();
 
@@ -178,11 +193,34 @@ public class MainController {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);
+
+        javafx.scene.control.DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.setStyle("-fx-background-color: white; -fx-border-color: #8A2BE2; -fx-border-width: 2px; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-font-size: 14px; -fx-text-fill: #6B7280; -fx-font-weight: bold;");
+        ((Stage) dialogPane.getScene().getWindow()).initStyle(javafx.stage.StageStyle.UNDECORATED);
+
+
+        Button okBtn = (Button) dialogPane.lookupButton(ButtonType.OK);
+        Button cancelBtn = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
+
+        String btnNormal = "-fx-background-color: #8A2BE2; -fx-text-fill: white; -fx-background-radius: 15px; -fx-cursor: hand; -fx-padding: 8 20 8 20;";
+        String btnHover = "-fx-background-color: #6d22b3; -fx-text-fill: white; -fx-background-radius: 15px; -fx-cursor: hand; -fx-padding: 8 20 8 20;";
+
+        if (okBtn != null) {
+            okBtn.setStyle(btnNormal);
+            okBtn.setOnMouseEntered(e -> okBtn.setStyle(btnHover));
+            okBtn.setOnMouseExited(e -> okBtn.setStyle(btnNormal));
+        }
+        if (cancelBtn != null) {
+            cancelBtn.setStyle(btnNormal);
+            cancelBtn.setOnMouseEntered(e -> cancelBtn.setStyle(btnHover));
+            cancelBtn.setOnMouseExited(e -> cancelBtn.setStyle(btnNormal));
+        }
+
         return alert.showAndWait().filter(r -> r == ButtonType.OK).isPresent();
     }
     @FXML public void goToProfile(ActionEvent event) throws IOException { switchScene(event, "profilePage.fxml"); }
     @FXML public void goToFriends(ActionEvent event) throws IOException { switchScene(event, "friendsPage.fxml"); }
-    @FXML public void goToHome(ActionEvent event) throws IOException { /* Zaten Home sayfasındayız */ }
+    @FXML public void goToHome(ActionEvent event) throws IOException { }
     @FXML public void goToActivity(ActionEvent event) throws IOException { switchScene(event, "activityPage.fxml"); }
     @FXML public void goToCalendar(ActionEvent event) throws IOException { switchScene(event, "calendarPage.fxml"); }
 
@@ -202,17 +240,16 @@ public class MainController {
             Parent root = loader.load();
 
             ActivityDetailController controller = loader.getController();
-            // Buraya dikkat: Activity class'ında getCreatorName gibi metodların olduğunu varsayıyorum
-            // Eğer yoksa act.getOwnerId() üzerinden User çekmen gerekebilir.
+
             controller.setActivityData(
-                    act.getActivityName(), // Veya oluşturanın ismi
+                    act.getActivityName(),
                     act.getDescription(),
-                    null // Şimdilik default icon kullansın diye null
+                    null
             );
 
             Stage popupStage = new Stage();
             popupStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-            popupStage.initStyle(javafx.stage.StageStyle.UNDECORATED); // Görseldeki gibi sade çerçeve
+            popupStage.initStyle(javafx.stage.StageStyle.UNDECORATED);
 
             Scene scene = new Scene(root);
             popupStage.setScene(scene);

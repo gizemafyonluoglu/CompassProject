@@ -438,3 +438,21 @@
 .ios-switch:selected .mark {
     -fx-translate-x: 9px; /* Açıkken sağa kayar */
 }
+
+/* Alert Dialog Butonları İçin */
+.dialog-pane .button {
+    -fx-background-color: #8A2BE2;
+    -fx-text-fill: white;
+    -fx-background-radius: 15px;
+    -fx-cursor: hand;
+}
+
+.dialog-pane .button:hover {
+    -fx-background-color: #6d22b3;
+}
+
+.dialog-pane .content {
+    -fx-font-size: 14px;
+    -fx-text-fill: #6B7280;
+    -fx-font-weight: bold;
+}
