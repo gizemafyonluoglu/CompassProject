@@ -140,4 +140,22 @@ public class Activity {
     public List<User> getJoinedUsers() { 
         return new ArrayList<>(joinedUsers); 
     }
+    public boolean isExpired() {
+        if (date == null || time == null) {
+            return false;
+        }
+
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+
+        if (date.isBefore(today)) {
+            return true;
+        }
+
+        if (date.equals(today) && time.isBefore(now)) {
+            return true;
+        }
+
+        return false;
+    }
 }
