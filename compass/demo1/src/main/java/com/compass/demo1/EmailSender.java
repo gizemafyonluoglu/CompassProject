@@ -36,25 +36,26 @@ public class EmailSender {
 
         final String cleanedEmail = toEmail.trim();
 
-        new Thread(() -> {
+    Thread thread = new Thread(new Runnable() {
+        @Override
+        public void run() {
             try {
                 Session session = getEmailSession();
                 session.setDebug(true);
-
                 Message message = new MimeMessage(session);
                 message.setFrom(new InternetAddress(EMAIL_FROM));
                 message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(cleanedEmail));
                 message.setSubject(subject);
                 message.setText(body);
-
                 Transport.send(message);
-
-                System.out.println("The email was sent successfully to: " + cleanedEmail);
+                System.out.println("Email sent successfully to: " + cleanedEmail);
             } catch (MessagingException e) {
-                System.err.println("An error occurred while sending the email to: " + cleanedEmail);
+                System.out.println("Error sending email to: " + cleanedEmail);
                 e.printStackTrace();
             }
-        }).start();
+        }
+    });
+    thread.start();
     }
 
     private static Session getEmailSession() {
