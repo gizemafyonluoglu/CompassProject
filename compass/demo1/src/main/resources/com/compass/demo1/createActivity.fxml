@@ -126,7 +126,7 @@
             <padding><Insets bottom="30.0" left="30.0" right="30.0" top="30.0" /></padding>
             <children>
                 <Label text="⚠️" style="-fx-font-size: 40;" />
-                <Label text="Hata!" style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #EF4444;" />
+                <Label text="Error!" style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #EF4444;" />
                 <Label fx:id="lblErrorMessage" text="Please fill in all the fields!"
                        wrapText="true" textAlignment="CENTER" style="-fx-text-fill: #475569; -fx-font-size: 14;" />
                 <Button text="OKAY" onAction="#hideErrorPopup"

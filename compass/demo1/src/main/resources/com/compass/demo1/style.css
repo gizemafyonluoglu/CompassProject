@@ -1,18 +1,18 @@
-/* Arka plan ve genel yazı tipi */
+
 .root {
     -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
 }
 
-/* Ekran görüntülerindeki beyaz kutu (Card) yapısı */
+
 .card {
     -fx-background-color: white;
     -fx-background-radius: 15;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
 }
 
-/* Mor Ana Buton (Sign In, OK, Create Account) */
+
 .button-primary {
-    -fx-background-color: #8A2BE2; /* Senin kullandığın mor tonu */
+    -fx-background-color: #8A2BE2;
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-background-radius: 8;
@@ -23,7 +23,7 @@
     -fx-background-color: #7A26C1;
 }
 
-/* Gri İkincil Buton (Sign Up, Cancel) */
+
 .button-secondary {
     -fx-background-color: transparent;
     -fx-border-color: #D1D5DB;
@@ -38,7 +38,7 @@
     -fx-background-color: #F3F4F6;
 }
 
-/* Giriş Alanları (TextField & PasswordField) */
+
 .text-field {
     -fx-background-color: #F9FAFB;
     -fx-border-color: #D1D5DB;
@@ -52,21 +52,21 @@
     -fx-background-color: white;
 }
 
-/* Başlık Yazıları */
+
 .label-title {
     -fx-font-size: 24px;
     -fx-font-weight: bold;
     -fx-text-fill: #111827;
 }
 
-/* Seçili buton hali */
+
 .interest-button.selected {
     -fx-background-color: #8A2BE2;
     -fx-text-fill: white;
     -fx-border-color: #8A2BE2;
 }
 
-/* İlk hal (Seçilmemiş) */
+
 .interest-button {
     -fx-background-color: transparent;
     -fx-border-color: #D1D5DB;
@@ -89,56 +89,56 @@
 }
 
 .sidebar-button-active {
-    -fx-background-color: #8A2BE2; /* Senin mor rengin */
+    -fx-background-color: #8A2BE2;
     -fx-min-width: 50;
     -fx-min-height: 50;
     -fx-background-radius: 12;
 }
 
-/* Mavi Badge (Place için) */
+
 .badge-blue {
-    -fx-background-color: #EFF6FF; /* Çok açık mavi */
-    -fx-text-fill: #3B82F6;        /* Belirgin mavi yazı */
+    -fx-background-color: #EFF6FF;
+    -fx-text-fill: #3B82F6;
     -fx-padding: 5 15 5 15;
     -fx-background-radius: 10;
     -fx-font-weight: bold;
 }
 
-/* Turuncu Badge (Date için) */
+
 .badge-orange {
-    -fx-background-color: #FFF7ED; /* Çok açık turuncu */
-    -fx-text-fill: #EA580C;        /* Turuncu yazı */
+    -fx-background-color: #FFF7ED;
+    -fx-text-fill: #EA580C;
     -fx-padding: 5 15 5 15;
     -fx-background-radius: 10;
     -fx-font-weight: bold;
 }
 
-/* Yeşil Badge (Time için) */
+
 .badge-green {
-    -fx-background-color: #F0FDF4; /* Çok açık yeşil */
-    -fx-text-fill: #16A34A;        /* Yeşil yazı */
+    -fx-background-color: #F0FDF4;
+    -fx-text-fill: #16A34A;
     -fx-padding: 5 15 5 15;
     -fx-background-radius: 10;
     -fx-font-weight: bold;
 }
 
-/* Ana Kart Satırı */
+
 .card-row {
     -fx-background-color: white;
     -fx-background-radius: 15;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 4);
 }
 
-/* Profil Sayfası Kutuları (İsim, Email, İlgi Alanları) */
+
 .profile-field-box {
-    -fx-border-color: #8A2BE2; /* Mor Çerçeve */
+    -fx-border-color: #8A2BE2;
     -fx-border-radius: 15;
     -fx-background-radius: 15;
     -fx-background-color: transparent;
     -fx-padding: 15 20 15 20;
 }
 
-/* İlgi Alanı Baloncukları (Music, Arts vb.) */
+
 .interest-pill {
     -fx-background-color: #8A2BE2;
     -fx-text-fill: white;
@@ -147,7 +147,7 @@
     -fx-background-radius: 20;
 }
 
-/* İkon Butonları (Düzenleme Kalemi) */
+
 .icon-button {
     -fx-background-color: transparent;
     -fx-cursor: hand;
@@ -159,7 +159,7 @@
     -fx-opacity: 0.7;
 }
 
-/* Kırmızı Sign Out Butonu */
+
 .button-danger {
     -fx-background-color: #B91C1C;
     -fx-text-fill: white;
@@ -170,7 +170,7 @@
 }
 .button-danger:hover { -fx-background-color: #991B1B; }
 
-/* Direkt üstüne tıklanıp değiştirilebilen İsim Alanı */
+
 .profile-text-field {
     -fx-background-color: transparent;
     -fx-text-fill: #8A2BE2;
@@ -179,12 +179,12 @@
     -fx-padding: 0;
 }
 .profile-text-field:focused {
-    -fx-background-color: #F3E8FF; /* Tıklanınca hafif mor arka plan */
+    -fx-background-color: #F3E8FF;
     -fx-background-radius: 5;
     -fx-padding: 2 5 2 5;
 }
 
-/* İlgi Alanı Seçme Butonları (Pop-up içi) */
+
 .interest-toggle {
     -fx-background-color: white;
     -fx-border-color: #8A2BE2;
@@ -199,7 +199,7 @@
     -fx-text-fill: white;
 }
 
-/* Arama Çubuğu */
+
 .search-bar {
     -fx-background-color: white;
     -fx-border-color: #8A2BE2;
@@ -212,7 +212,7 @@
     -fx-border-width: 2px;
 }
 
-/* Yuvarlak + Butonları (Yeşil ve Kırmızı) */
+
 .btn-plus-green {
     -fx-background-color: #22C55E;
     -fx-text-fill: white;
@@ -237,14 +237,14 @@
 }
 .btn-plus-red:hover { -fx-background-color: #DC2626; }
 
-/* Sütun Başlıkları */
+
 .column-header {
     -fx-font-weight: bold;
     -fx-text-fill: #4B5563;
     -fx-font-size: 14px;
 }
 
-/* Ortak İlgi Alanı Hapları (Açık Mor) */
+
 .common-interest-pill {
     -fx-background-color: #F3E8FF;
     -fx-text-fill: #8A2BE2;
@@ -254,7 +254,7 @@
     -fx-font-size: 12px;
 }
 
-/* Yuvarlak Çerçeveli İkon Butonu (Toggle için) */
+
 .icon-button-circle {
     -fx-background-color: transparent;
     -fx-border-color: #8A2BE2;
@@ -267,7 +267,7 @@
     -fx-background-color: #F3E8FF;
 }
 
-/* Aksiyon Butonları (Block, Unblock, Add Friend) */
+
 .btn-action-red {
     -fx-background-color: #EF4444; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 25; -fx-cursor: hand; -fx-font-weight: bold;
 }
@@ -283,30 +283,30 @@
 }
 .btn-action-blue:hover { -fx-background-color: #2563EB; }
 
-/* Takvim Kutucukları (Event Blocks) */
+
 .event-course {
-    -fx-background-color: #3B82F6; /* Mavi */
+    -fx-background-color: #3B82F6;
     -fx-text-fill: white;
     -fx-background-radius: 8;
     -fx-padding: 8;
     -fx-font-size: 12px;
 }
 .event-permanent {
-    -fx-background-color: #EF4444; /* Kırmızı */
+    -fx-background-color: #EF4444;
     -fx-text-fill: white;
     -fx-background-radius: 8;
     -fx-padding: 8;
     -fx-font-size: 12px;
 }
 .event-onetime {
-    -fx-background-color: #F97316; /* Turuncu */
+    -fx-background-color: #F97316;
     -fx-text-fill: white;
     -fx-background-radius: 8;
     -fx-padding: 8;
     -fx-font-size: 12px;
 }
 
-/* Mod Değiştirme Butonu (Day/Night) */
+
 .btn-mode {
     -fx-background-color: #F3E8FF;
     -fx-text-fill: #8A2BE2;
@@ -324,7 +324,7 @@
     -fx-cursor: hand;
 }
 
-/* Takvim Izgara Çizgisi */
+
 .calendar-line {
     -fx-border-color: #E5E7EB;
     -fx-border-width: 0 0 1 0;
@@ -347,7 +347,7 @@
     -fx-padding: 10 20;
 }
 
-/* TOGGLE SWITCH STİLİ */
+
 .toggle-switch {
     -fx-skin: "com.sun.javafx.scene.control.skin.CheckBoxSkin";
 }
@@ -389,24 +389,24 @@
 }
 
 .ios-switch:selected .box {
-    -fx-background-color: #8A2BE2; /* Senin Morun */
+    -fx-background-color: #8A2BE2;
 }
 
 .ios-switch .mark {
     -fx-background-color: white;
-    -fx-shape: "M 100 100 m -75 0 a 75 75 0 1 0 150 0 a 75 75 0 1 0 -150 0"; /* Yuvarlak Düğme */
+    -fx-shape: "M 100 100 m -75 0 a 75 75 0 1 0 150 0 a 75 75 0 1 0 -150 0";
     -fx-scale-x: 1.5;
     -fx-scale-y: 1.5;
 }
 
-/* Kilitli Toggle Görünümü */
+
 .toggle-container:disabled {
     -fx-opacity: 0.4;
 }
 
-/* --- iOS Style Switch CheckBox (DÜZELTİLMİŞ) --- */
+
 .ios-switch .box {
-    -fx-background-color: #D1D5DB; /* Kapalıyken gri */
+    -fx-background-color: #D1D5DB;
     -fx-background-radius: 20px;
     -fx-min-width: 45px;
     -fx-max-width: 45px;
@@ -415,7 +415,7 @@
 }
 
 .ios-switch:selected .box {
-    -fx-background-color: #8A2BE2; /* Açıkken mor */
+    -fx-background-color: #8A2BE2;
 }
 
 .ios-switch .mark {
@@ -426,20 +426,20 @@
     -fx-min-height: 21px;
     -fx-max-height: 21px;
 
-    /* Sündürmeyi engeller, kusursuz yuvarlak şekil verir */
+
     -fx-shape: "M10,0 a10,10 0 1,0 0,20 a10,10 0 1,0 0,-20";
 
-    -fx-translate-x: -9px; /* Kapalıyken solda durur */
+    -fx-translate-x: -9px;
 
-    /* Topun altına çok hafif şık bir gölge (3D efekti) */
+
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);
 }
 
 .ios-switch:selected .mark {
-    -fx-translate-x: 9px; /* Açıkken sağa kayar */
+    -fx-translate-x: 9px;
 }
 
-/* Alert Dialog Butonları İçin */
+
 .dialog-pane .button {
     -fx-background-color: #8A2BE2;
     -fx-text-fill: white;

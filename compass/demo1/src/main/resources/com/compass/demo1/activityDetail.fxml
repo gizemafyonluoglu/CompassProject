@@ -21,11 +21,11 @@
         </ImageView>
     </StackPane>
 
-    <Label fx:id="nameLabel" text="İsim Soyisim" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" />
+    <Label fx:id="nameLabel" text="Name Surname" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" />
 
     <VBox alignment="TOP_LEFT" style="-fx-background-color: #F8F4FF; -fx-background-radius: 10; -fx-padding: 10;">
         <Label text="Description:" style="-fx-font-weight: bold; -fx-text-fill: #8A2BE2;" />
-        <Label fx:id="descriptionLabel" text="Burada aktivite açıklaması yer alacak..." wrapText="true" style="-fx-text-fill: #555;" />
+        <Label fx:id="descriptionLabel" text="Activity description" wrapText="true" style="-fx-text-fill: #555;" />
     </VBox>
 
     <Button text="Close" onAction="#handleClose"
