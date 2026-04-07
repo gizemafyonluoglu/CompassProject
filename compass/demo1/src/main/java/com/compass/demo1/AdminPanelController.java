@@ -20,8 +20,6 @@ import java.util.List;
 public class AdminPanelController {
 
     @FXML private TilePane requestsContainer;
-
-    // --- Pop-up FXML Bağlantıları ---
     @FXML private Pane overlay;
     @FXML private VBox signOutPopup;
 
@@ -108,14 +106,14 @@ public class AdminPanelController {
         db.updateRequestStatus(req.getRequestId(), status);
         if ("approved".equals(status)) {
             db.approveClubBoardMember(req.getUserId(), req.getClubName());
-            System.out.println("Başarılı: " + req.getUserId() + " ID'li kullanıcı " + req.getClubName() + " yöneticisi yapıldı.");
+            System.out.println("Successfully approved: " + req.getUserId() + " ID'li kullanıcı " + req.getClubName() + " yöneticisi yapıldı.");
         } else {
-            System.out.println("Talep reddedildi: " + req.getRequestId());
+            System.out.println("Request declined: " + req.getRequestId());
         }
         loadPendingRequests();
     }
 
-    // --- Sign Out ve Pop-up Mantığı ---
+    // --- Sign Out ve Pop-up Logic ---
 
     @FXML
     public void showSignOutPopup() {
@@ -131,12 +129,10 @@ public class AdminPanelController {
 
     @FXML
     public void handleConfirmSignOut(ActionEvent event) {
-        // Oturumu tamamen temizle
         SessionManager.setCurrentUser(null);
-        System.out.println("Admin çıkış yaptı.");
+        System.out.println("The admin has logged out.");
 
         try {
-            // Çıkış yapınca kişiyi loginPage'e geri gönder
             FXMLLoader loader = new FXMLLoader(getClass().getResource("loginPage.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
