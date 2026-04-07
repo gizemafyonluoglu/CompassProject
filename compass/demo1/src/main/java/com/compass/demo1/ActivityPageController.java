@@ -43,6 +43,45 @@ public class ActivityPageController {
         User me = SessionManager.getCurrentUser();
         allActivities = Database.getInstance().getActivities();
 
+        if (me != null && me.getFriends() != null && !me.getFriends().isEmpty()) {
+            
+            // Kolay arama yapmak için arkadaşların ID'lerini bir listeye alalım
+            List<String> friendIds = new ArrayList<>();
+            for (User friend : me.getFriends()) {
+                friendIds.add(friend.getUserId());
+            }
+
+            // allActivities listesini sırala
+            allActivities.sort((act1, act2) -> {
+                boolean act1HasFriend = false;
+                boolean act2HasFriend = false;
+
+                // 1. Aktivitede (act1) herhangi bir arkadaşımız var mı?
+                for (User u : act1.getJoinedUsers()) {
+                    if (friendIds.contains(u.getUserId())) {
+                        act1HasFriend = true;
+                        break;
+                    }
+                }
+
+                // 2. Aktivitede (act2) herhangi bir arkadaşımız var mı?
+                for (User u : act2.getJoinedUsers()) {
+                    if (friendIds.contains(u.getUserId())) {
+                        act2HasFriend = true;
+                        break;
+                    }
+                }
+
+                // Karşılaştırma Mantığı:
+                // Eğer act1'de arkadaş varsa ve act2'de yoksa, act1'i yukarı taşı (-1)
+                if (act1HasFriend && !act2HasFriend) return -1;
+                // Eğer act2'de arkadaş varsa ve act1'de yoksa, act2'yi yukarı taşı (1)
+                if (!act1HasFriend && act2HasFriend) return 1;
+                // İkisinde de arkadaş varsa veya ikisinde de yoksa sıralamayı bozma (0)
+                return 0;
+            });
+        }
+        
         renderActivities("");
 
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
