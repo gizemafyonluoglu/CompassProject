@@ -93,11 +93,23 @@ public class Calendar {
         this.plans = new ArrayList<>(plans); 
     }
 
-    public List<Activity> getActivities() { 
-        return new ArrayList<>(activities); 
+    public List<Activity> getActivities() {
+        removeExpiredActivities();
+        return new ArrayList<>(activities);
     }
 
     public void setActivities(List<Activity> activities) { 
         this.activities = new ArrayList<>(activities); 
+    }
+    public void removeExpiredActivities() {
+        List<Activity> activeActivities = new ArrayList<>();
+
+        for (Activity activity : activities) {
+            if (activity != null && !activity.isExpired() && !activity.isCancelled()) {
+                activeActivities.add(activity);
+            }
+        }
+
+        activities = activeActivities;
     }
 }

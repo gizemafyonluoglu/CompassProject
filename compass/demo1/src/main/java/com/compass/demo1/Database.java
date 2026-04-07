@@ -131,6 +131,7 @@ public class Database {
     }
 
     public List<Activity> getActivities() {
+        removeExpiredActivitiesFromDatabase();
         List<Activity> activities = new ArrayList<>();
         for (Document doc : activitiesCol.find(eq("isCancelled", false))) {
             Activity a = documentToActivity(doc);
@@ -149,7 +150,16 @@ public class Database {
         if (doc == null) {
             return null;
         }
-        return documentToActivity(doc);
+
+        Activity activity = documentToActivity(doc);
+        if (activity == null) {
+            return null;
+        }
+        if (activity.isExpired()) {
+            activitiesCol.updateOne(eq("activityId", activityId), set("isCancelled", true));
+            return null;
+        }
+        return activity;
     }
 
     public void removeActivity(String activityId) {
@@ -779,6 +789,30 @@ public class Database {
         MembershipRequest req = new MembershipRequest(requestId, documentPath, clubName, submissionDate, userId);
         req.setStatus(status);
         return req;
+    }
+    public void removeExpiredActivitiesFromDatabase() {
+        List<Activity> activities = getActivitiesIncludingExpired();
+
+        for (Activity activity : activities) {
+            if (activity != null && activity.isExpired()) {
+                activitiesCol.updateOne(
+                    eq("activityId", activity.getActivityId()),
+                    set("isCancelled", true)
+                );
+            }
+        }
+    }
+    private List<Activity> getActivitiesIncludingExpired() {
+        List<Activity> activities = new ArrayList<>();
+
+        for (Document doc : activitiesCol.find()) {
+            Activity a = documentToActivity(doc);
+            if (a != null) {
+                activities.add(a);
+            }
+        }
+
+        return activities;
     }
 
     
