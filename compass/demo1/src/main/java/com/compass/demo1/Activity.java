@@ -114,6 +114,9 @@ public class Activity {
     }
 
     public void setQuota(int quota) { 
+        if(quota<0){
+            this.quota = 1;
+        }
         this.quota = quota; 
     }
  
