@@ -108,14 +108,14 @@ public class AdminPanelController {
         db.updateRequestStatus(req.getRequestId(), status);
         if ("approved".equals(status)) {
             db.approveClubBoardMember(req.getUserId(), req.getClubName());
-            System.out.println("Successfully approved board membership request: " + req.getUserId() + " ID'li kullanıcı " + req.getClubName() + " yöneticisi yapıldı.");
+            System.out.println("Başarılı: " + req.getUserId() + " ID'li kullanıcı " + req.getClubName() + " yöneticisi yapıldı.");
         } else {
-            System.out.println("Request rejected: " + req.getRequestId());
+            System.out.println("Talep reddedildi: " + req.getRequestId());
         }
         loadPendingRequests();
     }
 
-    // --- Sign Out and Pop-up Logic ---
+    // --- Sign Out ve Pop-up Mantığı ---
 
     @FXML
     public void showSignOutPopup() {
@@ -132,7 +132,7 @@ public class AdminPanelController {
     @FXML
     public void handleConfirmSignOut(ActionEvent event) {
         SessionManager.setCurrentUser(null);
-        System.out.println("The admin has logged out.");
+        System.out.println("Admin çıkış yaptı.");
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("loginPage.fxml"));
