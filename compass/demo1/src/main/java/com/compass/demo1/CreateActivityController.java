@@ -190,8 +190,13 @@ public class CreateActivityController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
         Parent root = loader.load();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        //stage.setScene(new Scene(root, 900, 600));
-        Scene scene = new Scene(root, stage.getScene().getWidth(), stage.getScene().getHeight());
+        boolean isFullScreen = stage.isFullScreen();
+        double currentWidth = stage.getWidth();
+        double currentHeight = stage.getHeight();
+
+        Scene scene = new Scene(root, currentWidth, currentHeight);
+        stage.setScene(scene);
+        stage.setFullScreen(isFullScreen);
         stage.show();
     }
 }
