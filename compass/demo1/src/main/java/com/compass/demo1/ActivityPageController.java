@@ -9,6 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
@@ -76,35 +77,35 @@ public class ActivityPageController {
         nameBox.setAlignment(Pos.CENTER_LEFT);
         nameBox.setPrefWidth(160);
 
-        // --- PROFİL FOTOSUNU DİNAMİK YÜKLEME KISMI BAŞLANGICI ---
+
         javafx.scene.image.ImageView profileView = new javafx.scene.image.ImageView();
-        String photoBase64 = act.getProfilePhotoBase64();
+        String photoBase64 = act.getJoinedUsers().get(0).getProfilePhotoBase64();
 
         if (photoBase64 != null && !photoBase64.isEmpty()) {
             try {
                 byte[] imageBytes = java.util.Base64.getDecoder().decode(photoBase64);
                 profileView.setImage(new javafx.scene.image.Image(new java.io.ByteArrayInputStream(imageBytes)));
             } catch (Exception e) {
-                profileView.setImage(new javafx.scene.image.Image(getClass().getResourceAsStream("icons/default_user.png")));
+                profileView.setImage(new javafx.scene.image.Image(getClass().getResourceAsStream("icons/user.png")));
             }
         } else {
             try {
-                profileView.setImage(new javafx.scene.image.Image(getClass().getResourceAsStream("icons/default_user.png")));
+                profileView.setImage(new javafx.scene.image.Image(getClass().getResourceAsStream("icons/user.png")));
             } catch (Exception e) {
                 System.out.println("Default image not found");
             }
         }
 
-        // Buradaki satır düzenine uysun diye boyutu 30x30 yaptım, istersen 40 yapabilirsin
+
         profileView.setFitHeight(30);
         profileView.setFitWidth(30);
         profileView.setClip(new javafx.scene.shape.Circle(15, 15, 15));
-        // --- PROFİL FOTOSUNU DİNAMİK YÜKLEME KISMI BİTİŞİ ---
+
 
         Label lblName = new Label(act.getActivityName());
         lblName.setStyle("-fx-font-weight: bold;");
 
-        // userIcon yerine profileView ekliyoruz
+
         nameBox.getChildren().addAll(profileView, lblName);
 
         Label lblPlace = new Label(act.getPlace());
@@ -164,7 +165,7 @@ public class ActivityPageController {
         row.getChildren().addAll(nameBox, lblPlace, lblDate, lblTime, lblQuota, spacer, actionBtn);
 
         //ACTİVİTY DETAİL
-        // createActivityRow metodunun sonuna ekle:
+
         row.setCursor(javafx.scene.Cursor.HAND);
         row.setOnMouseClicked(event -> {
             if (!(event.getTarget() instanceof Button)) {

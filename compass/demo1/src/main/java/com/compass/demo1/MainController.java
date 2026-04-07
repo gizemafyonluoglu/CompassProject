@@ -60,7 +60,7 @@ public class MainController {
         profileBox.setPrefSize(40, 40);
 
         ImageView profileView = new ImageView();
-        String photoBase64 = act.getProfilePhotoBase64();
+        String photoBase64 = act.getJoinedUsers().get(0).getProfilePhotoBase64();
 
         if (photoBase64 != null && !photoBase64.isEmpty()) {
             try {
@@ -69,12 +69,12 @@ public class MainController {
                 profileView.setImage(new Image(new java.io.ByteArrayInputStream(imageBytes)));
             } catch (Exception e) {
 
-                profileView.setImage(new Image(getClass().getResourceAsStream("icons/default_user.png")));
+                profileView.setImage(new Image(getClass().getResourceAsStream("icons/user.png")));
             }
         } else {
 
             try {
-                profileView.setImage(new Image(getClass().getResourceAsStream("icons/default_user.png")));
+                profileView.setImage(new Image(getClass().getResourceAsStream("icons/user.png")));
             } catch (Exception e) {
                 System.out.println("Default image not found");
             }
