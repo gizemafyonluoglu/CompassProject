@@ -174,7 +174,7 @@ public class CreateActivityController {
 
     @FXML
     public void handleCancel(ActionEvent event) throws IOException {
-        goToActivity(event);
+        goToHome(event);
     }
 
 
@@ -190,13 +190,9 @@ public class CreateActivityController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
         Parent root = loader.load();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        boolean isFullScreen = stage.isFullScreen();
-        double currentWidth = stage.getWidth();
-        double currentHeight = stage.getHeight();
-
-        Scene scene = new Scene(root, currentWidth, currentHeight);
+        Scene scene = new Scene(root, stage.getScene().getWidth(), stage.getScene().getHeight());
+        //stage.setScene(new Scene(root, 900, 600));
         stage.setScene(scene);
-        stage.setFullScreen(isFullScreen);
         stage.show();
     }
 }
