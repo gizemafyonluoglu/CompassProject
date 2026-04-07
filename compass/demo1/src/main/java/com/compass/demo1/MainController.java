@@ -242,7 +242,7 @@ public class MainController {
             ActivityDetailController controller = loader.getController();
 
             controller.setActivityData(
-                    act.getActivityName(),
+                    act.getJoinedUsers().get(0).getName(),
                     act.getDescription(),
                     null
             );
