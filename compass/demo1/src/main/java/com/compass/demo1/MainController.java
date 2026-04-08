@@ -327,10 +327,11 @@ public class MainController {
 
             ActivityDetailController controller = loader.getController();
 
+            String creatorPhotoBase64 = act.getJoinedUsers().get(0).getProfilePhotoBase64();
             controller.setActivityData(
                     act.getJoinedUsers().get(0).getName() + " " + act.getJoinedUsers().get(0).getSurname(),
                     act.getDescription(),
-                    null
+                    creatorPhotoBase64
             );
 
             Stage popupStage = new Stage();
