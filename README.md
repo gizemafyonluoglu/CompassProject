@@ -23,5 +23,6 @@ The project requires the following:
 Notes: 
   - If JavaFX is not installed, make sure to download and configure it
   - The application may be slower as a free server is used
+  - Ensure you run mvn clean javafx:run to properly initialize the project and prevent execution issues
 
 **Authors:** Developed by Bilkent University students as part of a CS 102 project.
