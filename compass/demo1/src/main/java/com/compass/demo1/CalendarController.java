@@ -166,37 +166,16 @@ public class CalendarController {
     @FXML
     public void addNewPlan() {
         try {
-            String name = inpName.getText().trim();
-
-            int selectedIndex = cmbDay.getSelectionModel().getSelectedIndex();
-            if (selectedIndex == -1) {
-                System.out.println("ERROR: Please select a day.");
-                return;
-            }
-
+            String name = inpName.getText();
             String[] startParts = inpStart.getText().split(":");
             String[] endParts = inpEnd.getText().split(":");
-
-            LocalTime startTime = LocalTime.of(
-                    Integer.parseInt(startParts[0].trim()),
-                    Integer.parseInt(startParts[1].trim())
-            );
-            LocalTime endTime = LocalTime.of(
-                    Integer.parseInt(endParts[0].trim()),
-                    Integer.parseInt(endParts[1].trim())
-            );
-
-            if (!endTime.isAfter(startTime)) {
-                System.out.println("ERROR: End time must be after start time.");
-                return;
-            }
-
-            DayOfWeek day = DayOfWeek.of(selectedIndex + 1);
-            LocalDate planDate = LocalDate.now().with(day);
+            LocalTime startTime = LocalTime.of(Integer.parseInt(startParts[0].trim()), Integer.parseInt(startParts[1].trim()));
+            LocalTime endTime = LocalTime.of(Integer.parseInt(endParts[0].trim()), Integer.parseInt(endParts[1].trim()));
+            int dayIndex = cmbDay.getSelectionModel().getSelectedIndex() + 1; 
+            LocalDate planDate = LocalDate.now().with(DayOfWeek.of(dayIndex));
 
             String planId = "P" + System.currentTimeMillis();
             Plan newPlan;
-
             if (rbPerm.isSelected()) {
                 newPlan = new PermanentPlan(planId, name, planDate, startTime, endTime);
             } else if (rbOneTime.isSelected()) {
@@ -206,6 +185,7 @@ public class CalendarController {
             }
 
             User me = SessionManager.getCurrentUser();
+
             newPlan.setOwnerUserId(me.getUserId());
             me.getCalendar().addPlan(newPlan);
 
@@ -214,12 +194,11 @@ public class CalendarController {
             db.saveUser(me);
 
             hidePopup();
-            renderCalendar();
+            renderCalendar(); 
 
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+        } catch (Exception e) {
             System.out.println("ERROR: The time format was entered incorrectly (e.g., enter 14:00)");
-        } catch (java.time.DateTimeException e) {
-            System.out.println("ERROR: Invalid day or time value.");
+            e.printStackTrace();
         }
     }
     @FXML public void goToProfile(ActionEvent event) throws IOException { switchScene(event, "profilePage.fxml"); }
